@@ -1,0 +1,25 @@
+import {StyleSheet} from 'react-native';
+import {theme} from '@styles/theme';
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    minHeight: 40,
+  },
+  searchIcon: {
+    marginRight: theme.spacing.sm,
+  },
+  input: {
+    flex: 1,
+    fontSize: theme.typography.fontSize.md,
+    color: theme.colors.text,
+    padding: 0,
+  },
+});
+
