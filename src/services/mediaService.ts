@@ -5,7 +5,7 @@ import type {MediaItem} from '../types/post.types';
  * Video duration mapping (in seconds)
  * Index corresponds to video-1 through video-10
  */
-const VIDEO_DURATIONS: number[] = [8, 7, 7, 5, 5, 12, 32, 50, 12, 49];
+const VIDEO_DURATIONS: number[] = [12, 8.5, 14, 13.3, 7.9, 8.4, 5.8, 10.3, 7.5, 7.1];
 
 /**
  * Get video duration from video asset index

@@ -14,7 +14,8 @@ interface VideoAsset {
  * Based on predefined video durations
  * Index corresponds to video-1 through video-10
  */
-const VIDEO_DURATIONS: number[] = [8, 7, 7, 5, 5, 12, 32, 50, 12, 49];
+// 12,8.5,14,13.3,7.9,8.4,5.8,10.3,7.5,7.1
+const VIDEO_DURATIONS: number[] = [12, 8.5, 14, 13.3, 7.9, 8.4, 5.8, 10.3, 7.5, 7.1];
 
 /**
  * Mock post service
