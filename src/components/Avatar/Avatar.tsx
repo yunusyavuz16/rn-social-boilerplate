@@ -1,7 +1,8 @@
 import React from 'react';
 import {View, Text} from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {styles} from './Avatar.styles';
+import {createStyles} from './Avatar.styles';
+import {useTheme} from '@hooks/useTheme';
 import type {AvatarProps} from './AvatarProps';
 
 /**
@@ -9,6 +10,9 @@ import type {AvatarProps} from './AvatarProps';
  */
 export const Avatar = React.memo<AvatarProps>(
   ({uri, username, size = 32}) => {
+    const {theme} = useTheme();
+    const styles = createStyles(theme);
+
     const getInitials = (name: string): string => {
       if (!name) return '?';
       const parts = name.trim().split(' ');

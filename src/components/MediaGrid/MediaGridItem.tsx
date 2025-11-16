@@ -2,7 +2,8 @@ import React from 'react';
 import {View, TouchableOpacity} from 'react-native';
 import {ImageWithThumbnail} from '@components/ImageWithThumbnail/ImageWithThumbnail';
 import {PostVideo} from '@components/PostVideo/PostVideo';
-import {styles} from './MediaGridItem.styles';
+import {createStyles} from './MediaGridItem.styles';
+import {useTheme} from '@hooks/useTheme';
 import type {MediaGridItemProps} from './MediaGridItemProps';
 
 /**
@@ -13,6 +14,9 @@ import type {MediaGridItemProps} from './MediaGridItemProps';
  */
 export const MediaGridItem = React.memo<MediaGridItemProps>(
   ({item, isVisible, onPress}) => {
+    const {theme} = useTheme();
+    const styles = createStyles(theme);
+
     const content = (
       <View style={styles.container} pointerEvents="none">
         {item.type === 'image' ? (

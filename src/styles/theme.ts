@@ -99,11 +99,5 @@ export const createTheme = (mode: ThemeMode) => {
   } as const;
 };
 
-/**
- * Default theme (light mode) - kept for backward compatibility
- * @deprecated Use ThemeContext instead
- */
-export const theme = createTheme('light');
-
 export type Theme = ReturnType<typeof createTheme>;
 

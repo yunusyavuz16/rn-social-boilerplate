@@ -11,7 +11,8 @@ import Animated, {
 import {useMediaCarousel} from '@hooks/useMediaCarousel';
 import {useImagePrefetch} from '@hooks/useImagePrefetch';
 import {ImageWithThumbnail} from '@components/ImageWithThumbnail/ImageWithThumbnail';
-import {styles} from './PostImageCarousel.styles';
+import {createStyles} from './PostImageCarousel.styles';
+import {useTheme} from '@hooks/useTheme';
 import type {MediaItem} from '../../types/post.types';
 
 interface PostImageCarouselProps {
@@ -27,6 +28,9 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
  */
 export const PostImageCarousel = React.memo<PostImageCarouselProps>(
   ({media}) => {
+    const {theme} = useTheme();
+    const styles = createStyles(theme);
+
     // Validation: ensure only images are passed (videos should use PostVideo component)
     const hasVideos = media.some(item => item.type === 'video');
     if (hasVideos) {

@@ -23,7 +23,11 @@ const AppContent: React.FC = () => {
 
   return (
     <>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={currentTheme.colors.background}
+        translucent={false}
+      />
       {isInitialized ? (
         <AppNavigator />
       ) : (

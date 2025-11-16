@@ -4,7 +4,8 @@ import {MediaGridItem} from './MediaGridItem';
 import {useMediaPlayerVisibility} from '@hooks/useMediaPlayerVisibility';
 import {useBreakpoint} from '@hooks/useBreakpoint';
 import {useImagePrefetch} from '@hooks/useImagePrefetch';
-import {styles} from './MediaGrid.styles';
+import {createStyles} from './MediaGrid.styles';
+import {useTheme} from '@hooks/useTheme';
 import type {MediaItem} from '../../types/post.types';
 
 interface MediaGridProps {
@@ -22,6 +23,8 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
  */
 export const MediaGrid = React.memo<MediaGridProps>(
   ({data, numColumns: propNumColumns, onItemPress, pauseVideos = false}) => {
+    const {theme} = useTheme();
+    const styles = createStyles(theme);
     const {breakpoint} = useBreakpoint();
     const {visibleItems, onViewableItemsChanged, isItemVisible} = useMediaPlayerVisibility(50);
     const {prefetchImages} = useImagePrefetch();

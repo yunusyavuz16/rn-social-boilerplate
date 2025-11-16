@@ -3,7 +3,8 @@ import {View} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {CustomVideo} from '@components/CustomVideo';
 import type {MediaItem} from '../../types/post.types';
-import {styles} from './PostVideo.styles';
+import {createStyles} from './PostVideo.styles';
+import {useTheme} from '@hooks/useTheme';
 
 interface PostVideoProps {
   video: MediaItem;
@@ -22,6 +23,9 @@ interface PostVideoProps {
  */
 export const PostVideo = React.memo<PostVideoProps>(
   ({video, paused = false, isVisible = true, showPlayButton, showTimer, enableTapToPlay}) => {
+    const {theme} = useTheme();
+    const styles = createStyles(theme);
+
     const getVideoSource = (uri: string | number) => {
       if (typeof uri === 'string') {
         return {uri};

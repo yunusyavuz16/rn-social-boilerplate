@@ -3,7 +3,7 @@ import {View, ActivityIndicator, StyleSheet} from 'react-native';
 import FastImage, {type ResizeMode} from 'react-native-fast-image';
 import {useProgressiveImage} from '@hooks/useProgressiveImage';
 import {imageCacheService, CachePriority} from '@services/imageCacheService';
-import {theme} from '@styles/theme';
+import {useTheme} from '@hooks/useTheme';
 
 interface ImageWithThumbnailProps {
   uri: string | number;
@@ -28,6 +28,7 @@ export const ImageWithThumbnail = React.memo<ImageWithThumbnailProps>(
     onLoad,
     onError,
   }) => {
+    const {theme} = useTheme();
     const {
       imageUri,
       thumbnailUri: thumbUri,
@@ -58,6 +59,26 @@ export const ImageWithThumbnail = React.memo<ImageWithThumbnailProps>(
     const fullImageSource = useMemo(() => {
       return imageCacheService.getCacheSource(imageUri, 'immutable', CachePriority.NORMAL);
     }, [imageUri]);
+
+    const styles = useMemo(
+      () =>
+        StyleSheet.create({
+          container: {
+            overflow: 'hidden',
+          },
+          loadingContainer: {
+            ...StyleSheet.absoluteFill,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'transparent',
+            zIndex: 2,
+          },
+          errorContainer: {
+            backgroundColor: theme.colors.border,
+          },
+        }),
+      [theme.colors.border],
+    );
 
     return (
       <View style={[styles.container, style]} pointerEvents="none">
@@ -103,20 +124,4 @@ export const ImageWithThumbnail = React.memo<ImageWithThumbnailProps>(
 );
 
 ImageWithThumbnail.displayName = 'ImageWithThumbnail';
-
-const styles = StyleSheet.create({
-  container: {
-    overflow: 'hidden',
-  },
-  loadingContainer: {
-    ...StyleSheet.absoluteFill,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-    zIndex: 2,
-  },
-  errorContainer: {
-    backgroundColor: theme.colors.border,
-  },
-});
 

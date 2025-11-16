@@ -11,7 +11,8 @@ import Video, { type VideoRef, type OnLoadData, type OnProgressData } from 'reac
 import { Icon } from '@components/Icon/Icon';
 import { ICONS } from '@constants/icons.constants';
 import type { CustomVideoProps } from './CustomVideoProps';
-import { styles } from './CustomVideo.styles';
+import { createStyles } from './CustomVideo.styles';
+import { useTheme } from '@hooks/useTheme';
 
 /**
  * Reusable video component that wraps react-native-video
@@ -39,6 +40,9 @@ export const CustomVideo = React.memo(
       },
       ref,
     ) => {
+      const {theme} = useTheme();
+      const styles = createStyles(theme);
+
       const videoRef = useRef<VideoRef | null>(null);
       const [hasError, setHasError] = useState(false);
       const [remainingTime, setRemainingTime] = useState<number | null>(null);
