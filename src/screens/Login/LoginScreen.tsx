@@ -1,15 +1,20 @@
 import React from 'react';
-import {View, Text, KeyboardAvoidingView, Platform} from 'react-native';
+import {KeyboardAvoidingView, Platform} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useTheme} from '@hooks/useTheme';
+import {ThemedView} from '@components/ThemedView/ThemedView';
+import {ThemedText} from '@components/ThemedText/ThemedText';
 import {Input} from '@components/Input/Input';
 import {Button} from '@components/Button/Button';
 import {useLogin} from './useLogin';
-import {styles} from './LoginScreen.styles';
+import {createStyles} from './LoginScreen.styles';
 
 /**
  * Login screen component
  */
 export const LoginScreen: React.FC = () => {
+  const {theme} = useTheme();
+  const styles = createStyles(theme);
   const {
     username,
     password,
@@ -25,9 +30,9 @@ export const LoginScreen: React.FC = () => {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}>
-        <View style={styles.container}>
-          <Text style={styles.title}>Instagram Clone</Text>
-          <View style={styles.form}>
+        <ThemedView style={styles.container}>
+          <ThemedText style={styles.title}>Instagram Clone</ThemedText>
+          <ThemedView style={styles.form}>
             <Input
               label="Username"
               value={username}
@@ -47,7 +52,7 @@ export const LoginScreen: React.FC = () => {
               autoCorrect={false}
               editable={!isLoading}
             />
-            {error && <Text style={styles.errorText}>{error}</Text>}
+            {error && <ThemedText style={styles.errorText}>{error}</ThemedText>}
             <Button
               title="Login"
               onPress={handleLogin}
@@ -55,8 +60,8 @@ export const LoginScreen: React.FC = () => {
               disabled={isLoading}
               style={styles.button}
             />
-          </View>
-        </View>
+          </ThemedView>
+        </ThemedView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

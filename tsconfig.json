@@ -22,7 +22,8 @@
       "@utils/*": ["src/utils/*"],
       "@constants/*": ["src/constants/*"],
       "@navigation/*": ["src/navigation/*"],
-      "@store/*": ["src/store/*"]
+      "@store/*": ["src/store/*"],
+      "@contexts/*": ["src/contexts/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],

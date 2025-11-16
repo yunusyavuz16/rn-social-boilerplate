@@ -1,14 +1,14 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import {
   FlatList,
-  View,
   ActivityIndicator,
-  Text,
   RefreshControl,
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { ThemedView } from '@components/ThemedView/ThemedView';
+import { ThemedText } from '@components/ThemedText/ThemedText';
 import { Post } from '@components/Post/Post';
 import { SearchBar } from '@components/SearchBar/SearchBar';
 import { Icon } from '@components/Icon/Icon';
@@ -18,9 +18,9 @@ import { useFeedRTK } from '@hooks/useFeedRTK';
 import { useImagePrefetch } from '@hooks/useImagePrefetch';
 import { useMediaPlayerVisibility } from '@hooks/useMediaPlayerVisibility';
 import { PostSkeleton } from '@components/Skeleton/Skeleton';
-import { styles } from './FeedScreen.styles';
+import { useTheme } from '@hooks/useTheme';
+import { createStyles } from './FeedScreen.styles';
 import type { RootStackParamList } from '../../navigation/types';
-import { theme } from '@styles/theme';
 import type { Post as PostType } from '../../types/post.types';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -29,6 +29,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
  * with memory optimization to prevent OOM crashes
  */
 export const FeedScreen: React.FC = () => {
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { posts, isLoading, isLoadingMore, error, hasMore, refresh, loadMore, toggleLike } =
     useFeedRTK();
@@ -99,21 +101,21 @@ export const FeedScreen: React.FC = () => {
       return null;
     }
     return (
-      <View style={styles.footerLoader}>
+      <ThemedView style={styles.footerLoader}>
         <ActivityIndicator size="small" color={theme.colors.primary} />
-      </View>
+      </ThemedView>
     );
-  }, [isLoadingMore]);
+  }, [isLoadingMore, theme.colors.primary, styles.footerLoader]);
 
   const renderEmpty = useCallback(() => {
     // Show loading skeleton during initial load
     if (isLoading) {
       return (
-        <View style={styles.emptyContainer}>
+        <ThemedView style={styles.emptyContainer}>
           {Array.from({ length: 3 }).map((_, i) => (
             <PostSkeleton key={i} />
           ))}
-        </View>
+        </ThemedView>
       );
     }
     if (error) {
@@ -121,18 +123,18 @@ export const FeedScreen: React.FC = () => {
     }
     // Only show "no posts yet" when loading is complete and there are no posts
     return <EmptyState type="feed" />;
-  }, [isLoading, error, refresh]);
+  }, [isLoading, error, refresh, styles.emptyContainer]);
 
   const renderEndMessage = useCallback(() => {
     if (!hasMore && posts.length > 0) {
       return (
-        <View style={styles.endMessage}>
-          <Text style={styles.endMessageText}>No more posts</Text>
-        </View>
+        <ThemedView style={styles.endMessage}>
+          <ThemedText style={styles.endMessageText}>No more posts</ThemedText>
+        </ThemedView>
       );
     }
     return null;
-  }, [hasMore, posts.length]);
+  }, [hasMore, posts.length, styles.endMessage, styles.endMessageText]);
 
   const viewabilityConfigCallbackPairs = useRef([
     {
@@ -143,15 +145,15 @@ export const FeedScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.searchBarContainer}>
+      <ThemedView style={styles.header}>
+        <ThemedView style={styles.searchBarContainer}>
           <SearchBar
             value={searchQuery}
             onChangeText={setSearchQuery}
             onFocus={handleSearchFocus}
             placeholder="Search"
           />
-        </View>
+        </ThemedView>
         <TouchableOpacity
           onPress={handleProfilePress}
           style={styles.profileButton}
@@ -159,11 +161,11 @@ export const FeedScreen: React.FC = () => {
           accessibilityRole="button">
           <Icon name={ICONS.PROFILE} size={24} color={theme.colors.text} family="Ionicons" />
         </TouchableOpacity>
-      </View>
+      </ThemedView>
       {error && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Error: {error.message}</Text>
-        </View>
+        <ThemedView style={styles.errorContainer}>
+          <ThemedText style={styles.errorText}>Error: {error.message}</ThemedText>
+        </ThemedView>
       )}
       <FlatList
         data={posts}

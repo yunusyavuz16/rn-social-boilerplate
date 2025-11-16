@@ -1,22 +1,27 @@
 import React, {useState, useCallback} from 'react';
-import {View, Text, Alert, ActivityIndicator} from 'react-native';
+import {Alert, ActivityIndicator, Pressable} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import {useAuthRTK} from '@hooks/useAuthRTK';
+import {useTheme} from '@hooks/useTheme';
+import {ThemedView} from '@components/ThemedView/ThemedView';
+import {ThemedText} from '@components/ThemedText/ThemedText';
 import {Avatar} from '@components/Avatar/Avatar';
 import {Button} from '@components/Button/Button';
 import {BackButton} from '@components/BackButton/BackButton';
-import {styles} from './ProfileScreen.styles';
+import {createStyles} from './ProfileScreen.styles';
 import type {NavigationProp} from '../../navigation/types';
-import {theme} from '@styles/theme';
+import type {ThemeMode} from '@styles/theme';
 
 /**
- * Profile screen displaying user information and logout functionality
+ * Profile screen displaying user information, theme switcher, and logout functionality
  */
 export const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<'Profile'>>();
   const {user, logout, isLoading: authLoading} = useAuthRTK();
+  const {theme, mode, setTheme} = useTheme();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const styles = createStyles(theme);
 
   const handleLogout = useCallback(() => {
     Alert.alert(
@@ -47,48 +52,89 @@ export const ProfileScreen: React.FC = () => {
     );
   }, [logout, navigation]);
 
+  const handleThemeChange = useCallback(
+    async (newMode: ThemeMode) => {
+      await setTheme(newMode);
+    },
+    [setTheme],
+  );
+
   if (authLoading || !user) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
+        <ThemedView style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
-        </View>
+        </ThemedView>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.headerContainer}>
+      <ThemedView style={styles.headerContainer}>
         <BackButton />
-      </View>
-      <View style={styles.content}>
+      </ThemedView>
+      <ThemedView style={styles.content}>
         {/* Profile Header */}
-        <View style={styles.header}>
+        <ThemedView style={styles.header}>
           <Avatar uri={user.avatar} username={user.username} size={80} />
-          <Text style={styles.username}>{user.username}</Text>
-          <Text style={styles.email}>{user.email}</Text>
-        </View>
+          <ThemedText style={styles.username}>{user.username}</ThemedText>
+          <ThemedText style={styles.email}>{user.email}</ThemedText>
+        </ThemedView>
 
         {/* Stats */}
-        <View style={styles.stats}>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>42</Text>
-            <Text style={styles.statLabel}>Posts</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>1.2K</Text>
-            <Text style={styles.statLabel}>Followers</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>856</Text>
-            <Text style={styles.statLabel}>Following</Text>
-          </View>
-        </View>
+        <ThemedView style={styles.stats}>
+          <ThemedView style={styles.statItem}>
+            <ThemedText style={styles.statValue}>42</ThemedText>
+            <ThemedText style={styles.statLabel}>Posts</ThemedText>
+          </ThemedView>
+          <ThemedView style={styles.statItem}>
+            <ThemedText style={styles.statValue}>1.2K</ThemedText>
+            <ThemedText style={styles.statLabel}>Followers</ThemedText>
+          </ThemedView>
+          <ThemedView style={styles.statItem}>
+            <ThemedText style={styles.statValue}>856</ThemedText>
+            <ThemedText style={styles.statLabel}>Following</ThemedText>
+          </ThemedView>
+        </ThemedView>
+
+        {/* Theme Switcher */}
+        <ThemedView style={styles.themeSection}>
+          <ThemedText style={styles.sectionTitle}>Theme</ThemedText>
+          <ThemedView style={styles.themeOptions}>
+            <Pressable
+              style={[
+                styles.themeOption,
+                mode === 'light' && styles.themeOptionActive,
+              ]}
+              onPress={() => handleThemeChange('light')}>
+              <ThemedText
+                style={[
+                  styles.themeOptionText,
+                  mode === 'light' && styles.themeOptionTextActive,
+                ]}>
+                Light Mode
+              </ThemedText>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.themeOption,
+                mode === 'dark' && styles.themeOptionActive,
+              ]}
+              onPress={() => handleThemeChange('dark')}>
+              <ThemedText
+                style={[
+                  styles.themeOptionText,
+                  mode === 'dark' && styles.themeOptionTextActive,
+                ]}>
+                Dark Mode
+              </ThemedText>
+            </Pressable>
+          </ThemedView>
+        </ThemedView>
 
         {/* Actions */}
-        <View style={styles.actions}>
-
+        <ThemedView style={styles.actions}>
           <Button
             title={isLoggingOut ? 'Logging out...' : 'Logout'}
             onPress={handleLogout}
@@ -97,8 +143,8 @@ export const ProfileScreen: React.FC = () => {
             variant="secondary"
             style={[styles.actionButton, styles.logoutButton]}
           />
-        </View>
-      </View>
+        </ThemedView>
+      </ThemedView>
     </SafeAreaView>
   );
 };

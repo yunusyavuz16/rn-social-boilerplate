@@ -77,9 +77,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.storikkproject"
+    namespace "com.stoikkproject"
     defaultConfig {
-        applicationId "com.storikkproject"
+        applicationId "com.stoikkproject"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

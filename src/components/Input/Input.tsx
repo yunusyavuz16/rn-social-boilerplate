@@ -1,6 +1,9 @@
 import React, {useState} from 'react';
-import {View, TextInput, Text} from 'react-native';
-import {styles} from './Input.styles';
+import {TextInput} from 'react-native';
+import {useTheme} from '@hooks/useTheme';
+import {ThemedView} from '@components/ThemedView/ThemedView';
+import {ThemedText} from '@components/ThemedText/ThemedText';
+import {createStyles} from './Input.styles';
 import type {InputProps} from './InputProps';
 
 /**
@@ -16,6 +19,8 @@ export const Input = React.memo<InputProps>(
     testID,
     ...textInputProps
   }) => {
+    const {theme} = useTheme();
+    const styles = createStyles(theme);
     const [isFocused, setIsFocused] = useState(false);
 
     const inputStyleCombined = [
@@ -25,12 +30,13 @@ export const Input = React.memo<InputProps>(
     ];
 
     return (
-      <View style={[styles.container, containerStyle]}>
-        {label && <Text style={styles.label}>{label}</Text>}
+      <ThemedView style={[styles.container, containerStyle]}>
+        {label && <ThemedText style={styles.label}>{label}</ThemedText>}
         <TextInput
           {...textInputProps}
           secureTextEntry={secureTextEntry}
           style={inputStyleCombined}
+          placeholderTextColor={theme.colors.textSecondary}
           onFocus={e => {
             setIsFocused(true);
             textInputProps.onFocus?.(e);
@@ -41,8 +47,8 @@ export const Input = React.memo<InputProps>(
           }}
           testID={testID}
         />
-        {error && <Text style={styles.error}>{error}</Text>}
-      </View>
+        {error && <ThemedText style={styles.error}>{error}</ThemedText>}
+      </ThemedView>
     );
   },
 );

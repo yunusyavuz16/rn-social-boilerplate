@@ -1,6 +1,8 @@
 import React, {useEffect, useRef} from 'react';
-import {View, StyleSheet, Animated, Dimensions} from 'react-native';
-import {theme} from '@styles/theme';
+import {StyleSheet, Animated, Dimensions} from 'react-native';
+import {useTheme} from '@hooks/useTheme';
+import {ThemedView} from '@components/ThemedView/ThemedView';
+import type {Theme} from '@styles/theme';
 
 interface SkeletonProps {
   width?: number | string;
@@ -12,6 +14,7 @@ interface SkeletonProps {
 /**
  * Shimmer skeleton component for loading states
  * Provides smooth shimmer animation
+ * Supports dark mode theming
  */
 export const Skeleton: React.FC<SkeletonProps> = ({
   width = '100%',
@@ -19,6 +22,8 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   borderRadius = 4,
   style,
 }) => {
+  const {theme} = useTheme();
+  const styles = createStyles(theme);
   const shimmerAnimation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -52,7 +57,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   });
 
   return (
-    <View style={[styles.container, {width, height, borderRadius}, style]}>
+    <ThemedView style={[styles.container, {width, height, borderRadius}, style]}>
       <Animated.View
         style={[
           styles.shimmer,
@@ -62,83 +67,90 @@ export const Skeleton: React.FC<SkeletonProps> = ({
           },
         ]}
       />
-    </View>
+    </ThemedView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: theme.colors.surface,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  shimmer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: theme.colors.border,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: theme.colors.surface,
+      overflow: 'hidden',
+      position: 'relative',
+    },
+    shimmer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: theme.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.1)'
+        : 'rgba(0, 0, 0, 0.1)',
+    },
+  });
 
 /**
  * Post skeleton component
+ * Supports dark mode theming
  */
 export const PostSkeleton: React.FC = () => {
+  const {theme} = useTheme();
+  const styles = createPostSkeletonStyles(theme);
   const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
   return (
-    <View style={postSkeletonStyles.container}>
+    <ThemedView style={styles.container}>
       {/* Header */}
-      <View style={postSkeletonStyles.header}>
+      <ThemedView style={styles.header}>
         <Skeleton width={32} height={32} borderRadius={16} />
-        <Skeleton width={100} height={16} style={postSkeletonStyles.username} />
-      </View>
+        <Skeleton width={100} height={16} style={styles.username} />
+      </ThemedView>
       {/* Media */}
       <Skeleton width={SCREEN_WIDTH} height={SCREEN_WIDTH} borderRadius={0} />
       {/* Actions */}
-      <View style={postSkeletonStyles.actions}>
+      <ThemedView style={styles.actions}>
         <Skeleton width={24} height={24} borderRadius={12} />
-        <Skeleton width={24} height={24} borderRadius={12} style={postSkeletonStyles.actionSpacing} />
-        <Skeleton width={24} height={24} borderRadius={12} style={postSkeletonStyles.actionSpacing} />
-      </View>
+        <Skeleton width={24} height={24} borderRadius={12} style={styles.actionSpacing} />
+        <Skeleton width={24} height={24} borderRadius={12} style={styles.actionSpacing} />
+      </ThemedView>
       {/* Caption */}
-      <Skeleton width="80%" height={14} style={postSkeletonStyles.caption} />
+      <Skeleton width="80%" height={14} style={styles.caption} />
       <Skeleton width="60%" height={14} />
-    </View>
+    </ThemedView>
   );
 };
 
-const postSkeletonStyles = StyleSheet.create({
-  container: {
-    backgroundColor: theme.colors.background,
-    marginBottom: theme.spacing.lg,
-    paddingBottom: theme.spacing.md,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-  },
-  username: {
-    marginLeft: theme.spacing.md,
-  },
-  actions: {
-    flexDirection: 'row',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-  },
-  actionSpacing: {
-    marginLeft: theme.spacing.md,
-  },
-  caption: {
-    marginTop: theme.spacing.xs,
-    marginBottom: theme.spacing.xs,
-    marginHorizontal: theme.spacing.md,
-  },
-});
+const createPostSkeletonStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: theme.colors.background,
+      marginBottom: theme.spacing.lg,
+      paddingBottom: theme.spacing.md,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+    },
+    username: {
+      marginLeft: theme.spacing.md,
+    },
+    actions: {
+      flexDirection: 'row',
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+    },
+    actionSpacing: {
+      marginLeft: theme.spacing.md,
+    },
+    caption: {
+      marginTop: theme.spacing.xs,
+      marginBottom: theme.spacing.xs,
+      marginHorizontal: theme.spacing.md,
+    },
+  });
 
 /**
  * Image skeleton component
@@ -152,17 +164,18 @@ export const ImageSkeleton: React.FC<{size?: number}> = ({size}) => {
 
 /**
  * Grid skeleton component
+ * Supports dark mode theming
  */
 export const GridSkeleton: React.FC<{numColumns?: number}> = ({numColumns = 3}) => {
   const {width: SCREEN_WIDTH} = Dimensions.get('window');
   const itemSize = SCREEN_WIDTH / numColumns;
 
   return (
-    <View style={gridSkeletonStyles.container}>
+    <ThemedView style={gridSkeletonStyles.container}>
       {Array.from({length: 6}).map((_, index) => (
         <ImageSkeleton key={index} size={itemSize} />
       ))}
-    </View>
+    </ThemedView>
   );
 };
 

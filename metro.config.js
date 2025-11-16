@@ -25,6 +25,7 @@ const config = {
       '@constants': path.resolve(__dirname, 'src/constants'),
       '@navigation': path.resolve(__dirname, 'src/navigation'),
       '@store': path.resolve(__dirname, 'src/store'),
+      '@contexts': path.resolve(__dirname, 'src/contexts'),
     },
     sourceExts: [
       ...(defaultConfig.resolver?.sourceExts || []),

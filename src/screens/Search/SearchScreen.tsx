@@ -1,8 +1,10 @@
 import React, {useState, useCallback, useEffect, useMemo, useRef} from 'react';
-import {View, TextInput} from 'react-native';
+import {TextInput} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {useTheme} from '@hooks/useTheme';
+import {ThemedView} from '@components/ThemedView/ThemedView';
 import {SearchBar} from '@components/SearchBar/SearchBar';
 import {MediaGrid} from '@components/MediaGrid/MediaGrid';
 import {EmptyState} from '@components/EmptyState/EmptyState';
@@ -13,7 +15,7 @@ import {useImagePrefetch} from '@hooks/useImagePrefetch';
 import {GridSkeleton} from '@components/Skeleton/Skeleton';
 import type {RootStackParamList} from '../../navigation/types';
 import type {MediaItem} from '../../types/post.types';
-import {styles} from './SearchScreen.styles';
+import {createStyles} from './SearchScreen.styles';
 
 /**
  * Search screen displaying media in a grid layout
@@ -22,6 +24,8 @@ import {styles} from './SearchScreen.styles';
  * Tapping a media item navigates to post detail screen
  */
 export const SearchScreen: React.FC = () => {
+  const {theme} = useTheme();
+  const styles = createStyles(theme);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const {media, mediaToPostMap, isLoading, error, search, clearSearch, hasInitialContent} = useSearchRTK();
   const {breakpoint} = useBreakpoint();
@@ -88,17 +92,17 @@ export const SearchScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
+      <ThemedView style={styles.header}>
         <BackButton />
-        <View style={styles.searchBarContainer}>
+        <ThemedView style={styles.searchBarContainer}>
           <SearchBar
             ref={searchInputRef}
             value={searchQuery}
             onChangeText={handleSearchChange}
             placeholder="Search..."
           />
-        </View>
-      </View>
+        </ThemedView>
+      </ThemedView>
       {isLoading ? (
         <GridSkeleton numColumns={numColumns} />
       ) : error ? (

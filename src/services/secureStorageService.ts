@@ -7,7 +7,7 @@ import {STORAGE_KEYS} from '@constants/storage.constants';
  * Uses iOS Keychain and Android Keystore for secure storage
  */
 class SecureStorageService {
-  private readonly service = 'StorikkKeychain';
+  private readonly service = 'StoikkKeychain';
 
   /**
    * Store an item securely

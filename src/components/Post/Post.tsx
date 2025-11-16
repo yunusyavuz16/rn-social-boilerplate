@@ -1,11 +1,14 @@
 import React, {useCallback} from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
+import {TouchableOpacity} from 'react-native';
+import {useTheme} from '@hooks/useTheme';
+import {ThemedView} from '@components/ThemedView/ThemedView';
+import {ThemedText} from '@components/ThemedText/ThemedText';
 import {PostImageCarousel} from '@components/PostImageCarousel/PostImageCarousel';
 import {PostVideo} from '@components/PostVideo/PostVideo';
 import {Avatar} from '@components/Avatar/Avatar';
 import {Icon} from '@components/Icon/Icon';
 import {ICONS} from '@constants/icons.constants';
-import {styles} from './Post.styles';
+import {createStyles} from './Post.styles';
 import type {PostProps} from './PostProps';
 
 /**
@@ -13,6 +16,8 @@ import type {PostProps} from './PostProps';
  * with memory optimization to pause videos when not visible
  */
 export const Post = React.memo<PostProps>(({post, onLike, isVisible = true}) => {
+  const {theme} = useTheme();
+  const styles = createStyles(theme);
   const handleLike = useCallback(() => {
     onLike(post.id);
   }, [post.id, onLike]);
@@ -25,26 +30,26 @@ export const Post = React.memo<PostProps>(({post, onLike, isVisible = true}) => 
   const shouldPauseVideo = !isVisible;
 
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.avatarContainer}>
+      <ThemedView style={styles.header}>
+        <ThemedView style={styles.avatarContainer}>
           <Avatar uri={post.userAvatar} username={post.username} size={32} />
-        </View>
-        <Text style={styles.username}>{post.username}</Text>
-      </View>
+        </ThemedView>
+        <ThemedText style={styles.username}>{post.username}</ThemedText>
+      </ThemedView>
 
       {/* Media */}
-      <View style={styles.mediaContainer}>
+      <ThemedView style={styles.mediaContainer}>
         {hasMultipleMedia || (post.type === 'images' && post.media.length > 0) ? (
           <PostImageCarousel media={post.media} isVisible={isVisible} />
         ) : isVideoOnly ? (
           <PostVideo video={post.media[0]} paused={shouldPauseVideo} />
         ) : null}
-      </View>
+      </ThemedView>
 
       {/* Actions */}
-      <View style={styles.actions}>
+      <ThemedView style={styles.actions}>
         <TouchableOpacity
           onPress={handleLike}
           style={styles.actionButton}
@@ -53,7 +58,7 @@ export const Post = React.memo<PostProps>(({post, onLike, isVisible = true}) => 
           <Icon
             name={post.isLiked ? ICONS.HEART : ICONS.HEART_OUTLINE}
             size={24}
-            color={post.isLiked ? '#FF3040' : '#000000'}
+            color={post.isLiked ? theme.colors.like : theme.colors.text}
             family="Ionicons"
           />
         </TouchableOpacity>
@@ -64,7 +69,7 @@ export const Post = React.memo<PostProps>(({post, onLike, isVisible = true}) => 
           <Icon
             name={ICONS.CHATBUBBLE}
             size={24}
-            color="#000000"
+            color={theme.colors.text}
             family="Ionicons"
           />
         </TouchableOpacity>
@@ -75,23 +80,23 @@ export const Post = React.memo<PostProps>(({post, onLike, isVisible = true}) => 
           <Icon
             name={ICONS.SHARE}
             size={24}
-            color="#000000"
+            color={theme.colors.text}
             family="Ionicons"
           />
         </TouchableOpacity>
-      </View>
+      </ThemedView>
 
       {/* Likes */}
-      <Text style={styles.likes}>{post.likes} likes</Text>
+      <ThemedText style={styles.likes}>{post.likes} likes</ThemedText>
 
       {/* Caption */}
-      <Text style={styles.caption}>
-        <Text style={styles.username}>{post.username}</Text> {post.caption}
-      </Text>
+      <ThemedText style={styles.caption}>
+        <ThemedText style={styles.username}>{post.username}</ThemedText> {post.caption}
+      </ThemedText>
 
       {/* Comments */}
-      <Text style={styles.comments}>View all {post.comments} comments</Text>
-    </View>
+      <ThemedText style={styles.comments}>View all {post.comments} comments</ThemedText>
+    </ThemedView>
   );
 });
 
