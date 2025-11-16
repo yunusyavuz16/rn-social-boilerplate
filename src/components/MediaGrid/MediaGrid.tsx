@@ -57,6 +57,14 @@ export const MediaGrid = React.memo<MediaGridProps>(
       }
     }, [data, visibleItems, prefetchImages]);
 
+    // Calculate item dimensions for 4:5 aspect ratio
+    const {itemWidth, itemHeight} = useMemo(() => {
+      const width = SCREEN_WIDTH / numColumns;
+      // 4:5 aspect ratio: height = width * (5/4) = width * 1.25
+      const height = width * 1.25;
+      return {itemWidth: width, itemHeight: height};
+    }, [numColumns]);
+
     const renderItem = useCallback(
       ({item, index}: {item: MediaItem; index: number}) => {
         const isVisible = pauseVideos ? false : isItemVisible(index);
@@ -64,7 +72,7 @@ export const MediaGrid = React.memo<MediaGridProps>(
           onItemPress?.(item);
         };
         return (
-          <View style={[styles.gridItem, {width: SCREEN_WIDTH / numColumns}]}>
+          <View style={[styles.gridItem, {width: itemWidth}]}>
             <MediaGridItem
               item={item}
               index={index}
@@ -74,22 +82,21 @@ export const MediaGrid = React.memo<MediaGridProps>(
           </View>
         );
       },
-      [isItemVisible, numColumns, pauseVideos, onItemPress],
+      [isItemVisible, pauseVideos, onItemPress, itemWidth],
     );
 
     const keyExtractor = useCallback((item: MediaItem) => item.id, []);
 
-    const itemSize = SCREEN_WIDTH / numColumns;
     const getItemLayout = useCallback(
       (_: unknown, index: number) => {
         const row = Math.floor(index / numColumns);
         return {
-          length: itemSize,
-          offset: row * itemSize * numColumns,
+          length: itemHeight, // Height of each item (4:5 aspect ratio)
+          offset: row * itemHeight, // Cumulative offset based on row
           index,
         };
       },
-      [numColumns, itemSize],
+      [numColumns, itemHeight],
     );
 
     return (

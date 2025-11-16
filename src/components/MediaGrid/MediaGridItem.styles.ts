@@ -4,7 +4,7 @@ import {theme} from '@styles/theme';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    aspectRatio: 1,
+    aspectRatio: 4 / 5, // 4:5 aspect ratio (width:height)
     backgroundColor: theme.colors.surface,
     overflow: 'hidden',
   },
