@@ -8,8 +8,6 @@ import Animated, {
   Extrapolate,
   runOnJS,
 } from 'react-native-reanimated';
-import type {VideoRef} from 'react-native-video';
-import {CustomVideo} from '@components/CustomVideo';
 import {useMediaCarousel} from '@hooks/useMediaCarousel';
 import {useImagePrefetch} from '@hooks/useImagePrefetch';
 import {ImageWithThumbnail} from '@components/ImageWithThumbnail/ImageWithThumbnail';
@@ -18,22 +16,24 @@ import type {MediaItem} from '../../types/post.types';
 
 interface PostImageCarouselProps {
   media: MediaItem[];
-  isVisible?: boolean;
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 /**
- * Swipeable media carousel component (handles both images and videos)
+ * Swipeable image carousel component for exactly 2 images
  * with memory management to prevent OOM crashes
- * All videos remain mounted to preserve playback position when scrolling
- * Videos are paused when not visible or not the current carousel index
+ * Only handles images - videos should never be passed to this component
  */
 export const PostImageCarousel = React.memo<PostImageCarouselProps>(
-  ({media, isVisible = true}) => {
+  ({media}) => {
+    // Validation: ensure only images are passed (videos should use PostVideo component)
+    const hasVideos = media.some(item => item.type === 'video');
+    if (hasVideos) {
+      console.warn('PostImageCarousel received videos. Videos should use PostVideo component instead.');
+    }
     const scrollX = useSharedValue(0);
     const scrollViewRef = useRef<Animated.ScrollView>(null);
-    const videoRefs = useRef<Map<number, VideoRef | null>>(new Map());
     // Use shared values for worklet-accessible state
     const currentIndexShared = useSharedValue(0);
     const mediaLengthShared = useSharedValue(media.length);
@@ -50,32 +50,15 @@ export const PostImageCarousel = React.memo<PostImageCarouselProps>(
       mediaLengthShared.value = media.length;
     }, [media.length, mediaLengthShared]);
 
-    // Prefetch next carousel item
+    // Prefetch next carousel item (only images) with thumbnails
     useEffect(() => {
       if (currentIndex < media.length - 1) {
         const nextItem = media[currentIndex + 1];
         if (nextItem && nextItem.type === 'image') {
-          prefetchImage(nextItem.uri);
+          prefetchImage(nextItem.uri, nextItem.thumbnail);
         }
       }
     }, [currentIndex, media, prefetchImage]);
-
-    // Cleanup all videos on unmount to prevent memory leaks
-    useEffect(() => {
-      return () => {
-        // Pause all videos when component unmounts
-        videoRefs.current.forEach(ref => {
-          if (ref) {
-            try {
-              // react-native-video handles cleanup, but we track refs for safety
-            } catch (error) {
-              console.warn('Error cleaning up video in carousel:', error);
-            }
-          }
-        });
-        videoRefs.current.clear();
-      };
-    }, []);
 
     const scrollHandler = useAnimatedScrollHandler({
       onScroll: event => {
@@ -92,21 +75,6 @@ export const PostImageCarousel = React.memo<PostImageCarouselProps>(
       },
     });
 
-    const getVideoSource = (uri: string | number) => {
-      if (typeof uri === 'string') {
-        return {uri};
-      }
-      return uri as any;
-    };
-
-    // Determine if video should be paused
-    // Video should be paused if:
-    // 1. Post is not visible, OR
-    // 2. This is not the current index in the carousel
-    // All videos remain mounted to preserve playback position
-    const shouldPauseVideo = (index: number) => {
-      return !isVisible || index !== currentIndex;
-    };
 
     return (
       <View style={styles.container}>
@@ -119,37 +87,15 @@ export const PostImageCarousel = React.memo<PostImageCarouselProps>(
           scrollEventThrottle={16}
           style={styles.scrollView}
           contentContainerStyle={styles.contentContainer}>
-          {media.map((item, index) => {
+          {media.map((item) => {
             return (
               <View key={item.id} style={styles.imageContainer}>
-                {item.type === 'image' ? (
-                  <ImageWithThumbnail
-                    uri={item.uri}
-                    thumbnailUri={item.thumbnail}
-                    style={styles.image}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  // Always render videos to preserve playback position
-                  // Videos are paused when not visible or not the current carousel index
-                  // This allows users to resume from where they left off
-                  <CustomVideo
-                    ref={ref => {
-                      if (ref) {
-                        videoRefs.current.set(index, ref);
-                      } else {
-                        videoRefs.current.delete(index);
-                      }
-                    }}
-                    source={getVideoSource(item.uri)}
-                    style={styles.image}
-                    paused={shouldPauseVideo(index)}
-                    duration={item.duration}
-                    showTimer={isVisible && index === currentIndex && !shouldPauseVideo(index)}
-                    enableTapToPlay={isVisible && index === currentIndex}
-                    showPlayButton={shouldPauseVideo(index) || (isVisible && index === currentIndex)}
-                  />
-                )}
+                <ImageWithThumbnail
+                  uri={item.uri}
+                  thumbnailUri={item.thumbnail}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
               </View>
             );
           })}

@@ -65,15 +65,17 @@ export const FeedScreen: React.FC = () => {
     }
   }, [hasMore, isLoadingMore, loadMore]);
 
-  // Prefetch next posts' media when scrolling
+  // Prefetch next posts' media when scrolling (with thumbnails)
   useEffect(() => {
     if (posts.length > 0) {
       const nextPosts = posts.slice(0, 5); // Prefetch first 5 posts
-      const mediaUris = nextPosts.flatMap(post =>
-        post.media.filter(m => m.type === 'image').map(m => m.uri),
+      const mediaItems = nextPosts.flatMap(post =>
+        post.media
+          .filter(m => m.type === 'image')
+          .map(m => ({uri: m.uri, thumbnailUri: m.thumbnail})),
       );
-      if (mediaUris.length > 0) {
-        prefetchImages(mediaUris);
+      if (mediaItems.length > 0) {
+        prefetchImages(mediaItems);
       }
     }
   }, [posts, prefetchImages]);

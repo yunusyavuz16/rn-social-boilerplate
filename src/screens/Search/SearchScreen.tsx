@@ -56,15 +56,15 @@ export const SearchScreen: React.FC = () => {
     [search, clearSearch],
   );
 
-  // Prefetch visible media items
+  // Prefetch visible media items with thumbnails
   useEffect(() => {
     if (media.length > 0) {
       const visibleItems = media.slice(0, 12); // First 12 items
-      const imageUris = visibleItems
+      const imageItems = visibleItems
         .filter(item => item.type === 'image')
-        .map(item => item.uri);
-      if (imageUris.length > 0) {
-        prefetchImages(imageUris);
+        .map(item => ({uri: item.uri, thumbnailUri: item.thumbnail}));
+      if (imageItems.length > 0) {
+        prefetchImages(imageItems);
       }
     }
   }, [media, prefetchImages]);

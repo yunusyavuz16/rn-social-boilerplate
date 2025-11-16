@@ -1,66 +1,46 @@
-import {useCallback, useRef} from 'react';
-import FastImage from 'react-native-fast-image';
+import {useCallback} from 'react';
+import {imageCacheService, CachePriority} from '@services/imageCacheService';
 
 interface UseImagePrefetchReturn {
-  prefetchImage: (uri: string | number) => void;
-  prefetchImages: (uris: (string | number)[]) => void;
+  prefetchImage: (uri: string | number, thumbnailUri?: string | number, priority?: CachePriority) => void;
+  prefetchImages: (items: Array<{uri: string | number; thumbnailUri?: string | number}>, priority?: CachePriority) => void;
+  isPrefetched: (uri: string | number) => boolean;
+  isThumbnailPrefetched: (thumbnailUri: string | number) => boolean;
 }
 
 /**
- * Hook for image prefetching
- * Preloads images before they're needed for smoother UX
+ * Hook for image prefetching with cache management
+ * Preloads images and thumbnails before they're needed for smoother UX
+ * Uses centralized cache service for optimal performance
  */
 export const useImagePrefetch = (): UseImagePrefetchReturn => {
-  const prefetchedRef = useRef<Set<string>>(new Set());
-
-  const getImageUri = useCallback((uri: string | number): string => {
-    if (typeof uri === 'string') {
-      return uri;
-    }
-    // For require() imports, we can't prefetch them
-    return '';
-  }, []);
-
   const prefetchImage = useCallback(
-    (uri: string | number) => {
-      const imageUri = getImageUri(uri);
-      if (!imageUri || prefetchedRef.current.has(imageUri)) {
-        return;
-      }
-
-      try {
-        FastImage.preload([{uri: imageUri}]);
-        prefetchedRef.current.add(imageUri);
-      } catch (error) {
-        console.warn('Error prefetching image:', error);
-      }
+    (uri: string | number, thumbnailUri?: string | number, priority: CachePriority = CachePriority.NORMAL) => {
+      imageCacheService.prefetchImage(uri, thumbnailUri, priority);
     },
-    [getImageUri],
+    [],
   );
 
   const prefetchImages = useCallback(
-    (uris: (string | number)[]) => {
-      const imageUris = uris
-        .map(getImageUri)
-        .filter((uri): uri is string => Boolean(uri) && !prefetchedRef.current.has(uri));
-
-      if (imageUris.length === 0) {
-        return;
-      }
-
-      try {
-        FastImage.preload(imageUris.map(uri => ({uri})));
-        imageUris.forEach(uri => prefetchedRef.current.add(uri));
-      } catch (error) {
-        console.warn('Error prefetching images:', error);
-      }
+    (items: Array<{uri: string | number; thumbnailUri?: string | number}>, priority: CachePriority = CachePriority.NORMAL) => {
+      imageCacheService.prefetchImages(items, priority);
     },
-    [getImageUri],
+    [],
   );
+
+  const isPrefetched = useCallback((uri: string | number) => {
+    return imageCacheService.isPrefetched(uri);
+  }, []);
+
+  const isThumbnailPrefetched = useCallback((thumbnailUri: string | number) => {
+    return imageCacheService.isThumbnailPrefetched(thumbnailUri);
+  }, []);
 
   return {
     prefetchImage,
     prefetchImages,
+    isPrefetched,
+    isThumbnailPrefetched,
   };
 };
 

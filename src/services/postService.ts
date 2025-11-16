@@ -10,20 +10,31 @@ interface VideoAsset {
 }
 
 /**
+ * Image asset with its corresponding thumbnail
+ */
+interface ImageAsset {
+  uri: string | number;
+  thumbnail: string | number;
+}
+
+/**
  * Video duration mapping (in seconds)
  * Based on predefined video durations
  * Index corresponds to video-1 through video-10
  */
-// 12,8.5,14,13.3,7.9,8.4,5.8,10.3,7.5,7.1
 const VIDEO_DURATIONS: number[] = [12, 8.5, 14, 13.3, 7.9, 8.4, 5.8, 10.3, 7.5, 7.1];
 
 /**
  * Mock post service
- * Generates diverse mock posts with various media combinations
+ * Generates mock posts with exactly 2 images (swipeable carousel) or 1 video
  */
 class PostService {
-  public getAllImageAssets() {
-    return [
+  /**
+   * Get all image assets with their corresponding thumbnails
+   * Returns an array of objects containing uri and thumbnail
+   */
+  public getAllImageAssets(): ImageAsset[] {
+    const images = [
       require('../assets/images/image-1.png'),
       require('../assets/images/image-2.png'),
       require('../assets/images/image-3.png'),
@@ -35,6 +46,24 @@ class PostService {
       require('../assets/images/image-9.png'),
       require('../assets/images/image-10.png'),
     ];
+
+    const thumbnails = [
+      require('../assets/thumbnails/image-1.png'),
+      require('../assets/thumbnails/image-2.png'),
+      require('../assets/thumbnails/image-3.png'),
+      require('../assets/thumbnails/image-4.png'),
+      require('../assets/thumbnails/image-5.png'),
+      require('../assets/thumbnails/image-6.png'),
+      require('../assets/thumbnails/image-7.png'),
+      require('../assets/thumbnails/image-8.png'),
+      require('../assets/thumbnails/image-9.png'),
+      require('../assets/thumbnails/image-10.png'),
+    ];
+
+    return images.map((uri, index) => ({
+      uri,
+      thumbnail: thumbnails[index],
+    }));
   }
 
   /**
@@ -90,10 +119,9 @@ class PostService {
     const allVideos = this.getAllVideoAssets();
     const startIndex = (page - 1) * limit;
 
-    // Generate diverse post types
+    // Generate posts with exactly 2 images or 1 video
     for (let i = 0; i < limit; i++) {
       const postIndex = startIndex + i;
-      const postType = postIndex % 5; // 5 different post types
       const username = usernames[postIndex % usernames.length];
       let media: MediaItem[] = [];
       let postTypeName: PostType = 'images';
@@ -102,86 +130,39 @@ class PostService {
       const shuffledImages = this.shuffleArray(allImages);
       const shuffledVideos = this.shuffleArray(allVideos);
 
-      switch (postType) {
-        case 0: // Single image (20%)
-          media = [
-            {
-              id: `img_${postIndex}_1`,
-              type: 'image',
-              uri: shuffledImages[0],
-            },
-          ];
-          postTypeName = 'images';
-          break;
+      // Alternate between 2 images and 1 video
+      const isVideoPost = postIndex % 2 === 1;
 
-        case 1: // Multiple images (2-5 images) (20%)
-          const imageCount = 2 + (postIndex % 4); // 2-5 images
-          media = Array.from({length: imageCount}, (_, idx) => ({
-            id: `img_${postIndex}_${idx + 1}`,
-            type: 'image' as const,
-            uri: shuffledImages[idx % shuffledImages.length],
-          }));
-          postTypeName = 'images';
-          break;
-
-        case 2: // Single video (20%)
+      if (isVideoPost) {
+        // Single video post
+        const videoAsset = shuffledVideos[0];
+        const videoItem: MediaItem = {
+          id: `video_${postIndex}_1`,
+          type: 'video',
+          uri: videoAsset.uri,
+          duration: videoAsset.duration,
+        };
+        media = [videoItem];
+        postTypeName = 'video';
+      } else {
+        // Exactly 2 images post (swipeable carousel) with thumbnails
+        const image1 = shuffledImages[0];
+        const image2 = shuffledImages[1];
+        media = [
           {
-            const videoAsset = shuffledVideos[0];
-            const videoItem: MediaItem = {
-              id: `video_${postIndex}_1`,
-              type: 'video',
-              uri: videoAsset.uri,
-              duration: videoAsset.duration,
-            };
-            media = [videoItem];
-            postTypeName = 'video';
-          }
-          break;
-
-        case 3: // Multiple videos (2-3 videos) (20%)
-          const videoCount = 2 + (postIndex % 2); // 2-3 videos
-          media = Array.from({length: videoCount}, (_, idx): MediaItem => {
-            const videoAsset = shuffledVideos[idx % shuffledVideos.length];
-            return {
-              id: `video_${postIndex}_${idx + 1}`,
-              type: 'video' as const,
-              uri: videoAsset.uri,
-              duration: videoAsset.duration,
-            };
-          });
-          postTypeName = 'video';
-          break;
-
-        case 4: // Mixed media (images + videos) (20%)
-          const mixedImageCount = 1 + (postIndex % 3); // 1-3 images
-          const mixedVideoCount = 1 + (postIndex % 2); // 1-2 videos
-          const mixedMedia: MediaItem[] = [];
-
-          // Add images first
-          for (let imgIdx = 0; imgIdx < mixedImageCount; imgIdx++) {
-            mixedMedia.push({
-              id: `mixed_${postIndex}_img_${imgIdx + 1}`,
-              type: 'image',
-              uri: shuffledImages[imgIdx % shuffledImages.length],
-            });
-          }
-
-          // Add videos
-          for (let vidIdx = 0; vidIdx < mixedVideoCount; vidIdx++) {
-            const videoAsset = shuffledVideos[vidIdx % shuffledVideos.length];
-            const videoItem: MediaItem = {
-              id: `mixed_${postIndex}_vid_${vidIdx + 1}`,
-              type: 'video',
-              uri: videoAsset.uri,
-              duration: videoAsset.duration,
-            };
-            mixedMedia.push(videoItem);
-          }
-
-          media = mixedMedia;
-          // For mixed media, determine type based on first item
-          postTypeName = media[0].type === 'image' ? 'images' : 'video';
-          break;
+            id: `img_${postIndex}_1`,
+            type: 'image',
+            uri: image1.uri,
+            thumbnail: image1.thumbnail,
+          },
+          {
+            id: `img_${postIndex}_2`,
+            type: 'image',
+            uri: image2.uri,
+            thumbnail: image2.thumbnail,
+          },
+        ];
+        postTypeName = 'images';
       }
 
       posts.push({

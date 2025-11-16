@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {View, ActivityIndicator, StyleSheet} from 'react-native';
 import FastImage, {type ResizeMode} from 'react-native-fast-image';
 import {useProgressiveImage} from '@hooks/useProgressiveImage';
+import {imageCacheService, CachePriority} from '@services/imageCacheService';
 import {theme} from '@styles/theme';
 
 interface ImageWithThumbnailProps {
@@ -47,38 +48,54 @@ export const ImageWithThumbnail = React.memo<ImageWithThumbnailProps>(
       onError?.();
     };
 
+    // Get optimized cache source for thumbnail
+    const thumbnailSource = useMemo(() => {
+      if (!thumbUri) return null;
+      return imageCacheService.getCacheSource(thumbUri, 'immutable', CachePriority.HIGH);
+    }, [thumbUri]);
+
+    // Get optimized cache source for full image
+    const fullImageSource = useMemo(() => {
+      return imageCacheService.getCacheSource(imageUri, 'immutable', CachePriority.NORMAL);
+    }, [imageUri]);
+
     return (
       <View style={[styles.container, style]} pointerEvents="none">
-        {/* Thumbnail layer (blurred/low quality) */}
-        {thumbUri && !hasError && (
-          <FastImage
-            source={typeof thumbUri === 'string' ? {uri: thumbUri} : thumbUri}
-            style={[StyleSheet.absoluteFill, styles.thumbnail]}
-            resizeMode={resizeMode}
-            onLoad={onThumbnailLoad}
-            pointerEvents="none"
-          />
-        )}
-
-        {/* Full image layer */}
+        {/* Full image layer - always rendered so it can load */}
         {!hasError ? (
           <>
-            {isLoading && (
+            {/* Only show loading indicator if no thumbnail is available */}
+            {isLoading && !thumbUri && (
               <View style={styles.loadingContainer} pointerEvents="none">
                 <ActivityIndicator size="small" color={theme.colors.white} />
               </View>
             )}
-            <FastImage
-              source={typeof imageUri === 'string' ? {uri: imageUri} : imageUri}
-              style={StyleSheet.absoluteFill}
-              resizeMode={resizeMode}
-              onLoad={handleImageLoad}
-              onError={handleImageError}
-              pointerEvents="none"
-            />
+            <View style={StyleSheet.absoluteFill} pointerEvents="none">
+              <FastImage
+                source={fullImageSource}
+                style={StyleSheet.absoluteFill}
+                resizeMode={resizeMode}
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+                pointerEvents="none"
+              />
+            </View>
           </>
         ) : (
           <View style={[StyleSheet.absoluteFill, styles.errorContainer]} pointerEvents="none" />
+        )}
+
+        {/* Thumbnail layer - visible while loading at full opacity, hidden when full image loads */}
+        {thumbUri && !hasError && thumbnailSource && isLoading && (
+          <View style={StyleSheet.absoluteFill} pointerEvents="none">
+            <FastImage
+              source={thumbnailSource}
+              style={StyleSheet.absoluteFill}
+              resizeMode={resizeMode}
+              onLoad={onThumbnailLoad}
+              pointerEvents="none"
+            />
+          </View>
         )}
       </View>
     );
@@ -91,15 +108,12 @@ const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
   },
-  thumbnail: {
-    opacity: 0.5,
-  },
   loadingContainer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.surface,
-    zIndex: 1,
+    backgroundColor: 'transparent',
+    zIndex: 2,
   },
   errorContainer: {
     backgroundColor: theme.colors.border,

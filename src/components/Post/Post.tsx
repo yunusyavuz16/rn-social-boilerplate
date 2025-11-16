@@ -22,9 +22,11 @@ export const Post = React.memo<PostProps>(({post, onLike, isVisible = true}) => 
     onLike(post.id);
   }, [post.id, onLike]);
 
-  // Determine if we should use carousel (multiple items) or single video
-  const hasMultipleMedia = post.media.length > 1;
-  const isVideoOnly = post.type === 'video' && !hasMultipleMedia;
+  // Determine media rendering:
+  // - Carousel for exactly 2 images (swipeable)
+  // - Single video player for 1 video (no carousel)
+  const isImageCarousel = post.type === 'images' && post.media.length === 2;
+  const isSingleVideo = post.type === 'video' && post.media.length === 1;
 
   // Pause video if post is not visible (memory optimization)
   const shouldPauseVideo = !isVisible;
@@ -41,9 +43,9 @@ export const Post = React.memo<PostProps>(({post, onLike, isVisible = true}) => 
 
       {/* Media */}
       <ThemedView style={styles.mediaContainer}>
-        {hasMultipleMedia || (post.type === 'images' && post.media.length > 0) ? (
-          <PostImageCarousel media={post.media} isVisible={isVisible} />
-        ) : isVideoOnly ? (
+        {isImageCarousel ? (
+          <PostImageCarousel media={post.media} />
+        ) : isSingleVideo ? (
           <PostVideo video={post.media[0]} paused={shouldPauseVideo} isVisible={isVisible} />
         ) : null}
       </ThemedView>

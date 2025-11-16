@@ -8,7 +8,7 @@ export interface MediaItem {
   id: string;
   type: MediaType;
   uri: string | number; // Can be string URL or require() number
-  thumbnail?: string;
+  thumbnail?: string | number; // Can be string URL or require() number
   duration?: number; // Video duration in seconds
 }
 

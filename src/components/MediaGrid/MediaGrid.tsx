@@ -43,16 +43,16 @@ export const MediaGrid = React.memo<MediaGridProps>(
       return 3;
     }, [propNumColumns, breakpoint]);
 
-    // Prefetch visible items
+    // Prefetch visible items with thumbnails
     useEffect(() => {
       if (data.length > 0 && visibleItems.size > 0) {
         const visibleIndices = Array.from(visibleItems).slice(0, 12);
-        const imageUris = visibleIndices
+        const imageItems = visibleIndices
           .map(index => data[index])
           .filter(item => item && item.type === 'image')
-          .map(item => item.uri);
-        if (imageUris.length > 0) {
-          prefetchImages(imageUris);
+          .map(item => ({uri: item.uri, thumbnailUri: item.thumbnail}));
+        if (imageItems.length > 0) {
+          prefetchImages(imageItems);
         }
       }
     }, [data, visibleItems, prefetchImages]);
