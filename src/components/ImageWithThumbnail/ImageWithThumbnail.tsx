@@ -48,7 +48,7 @@ export const ImageWithThumbnail = React.memo<ImageWithThumbnailProps>(
     };
 
     return (
-      <View style={[styles.container, style]}>
+      <View style={[styles.container, style]} pointerEvents="none">
         {/* Thumbnail layer (blurred/low quality) */}
         {thumbUri && !hasError && (
           <FastImage
@@ -56,6 +56,7 @@ export const ImageWithThumbnail = React.memo<ImageWithThumbnailProps>(
             style={[StyleSheet.absoluteFill, styles.thumbnail]}
             resizeMode={resizeMode}
             onLoad={onThumbnailLoad}
+            pointerEvents="none"
           />
         )}
 
@@ -63,7 +64,7 @@ export const ImageWithThumbnail = React.memo<ImageWithThumbnailProps>(
         {!hasError ? (
           <>
             {isLoading && (
-              <View style={styles.loadingContainer}>
+              <View style={styles.loadingContainer} pointerEvents="none">
                 <ActivityIndicator size="small" color={theme.colors.white} />
               </View>
             )}
@@ -73,10 +74,11 @@ export const ImageWithThumbnail = React.memo<ImageWithThumbnailProps>(
               resizeMode={resizeMode}
               onLoad={handleImageLoad}
               onError={handleImageError}
+              pointerEvents="none"
             />
           </>
         ) : (
-          <View style={[StyleSheet.absoluteFill, styles.errorContainer]} />
+          <View style={[StyleSheet.absoluteFill, styles.errorContainer]} pointerEvents="none" />
         )}
       </View>
     );

@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -146,14 +147,21 @@ export const FeedScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ThemedView style={styles.header}>
-        <ThemedView style={styles.searchBarContainer}>
-          <SearchBar
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            onFocus={handleSearchFocus}
-            placeholder="Search"
-          />
-        </ThemedView>
+        <TouchableOpacity
+          style={styles.searchBarContainer}
+          onPress={handleSearchFocus}
+          activeOpacity={1}
+          accessibilityLabel="Go to search"
+          accessibilityRole="button">
+          <View pointerEvents="none" style={{flex: 1}}>
+            <SearchBar
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              onFocus={handleSearchFocus}
+              placeholder="Search"
+            />
+          </View>
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={handleProfilePress}
           style={styles.profileButton}

@@ -37,6 +37,8 @@ export const SearchBar = React.memo(
             autoCapitalize="none"
             autoCorrect={false}
             testID={testID}
+            editable={true}
+            selectTextOnFocus={false}
           />
         </ThemedView>
       );

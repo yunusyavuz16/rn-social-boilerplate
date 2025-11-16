@@ -9,6 +9,9 @@ interface PostVideoProps {
   video: MediaItem;
   paused?: boolean;
   isVisible?: boolean;
+  showPlayButton?: boolean;
+  showTimer?: boolean;
+  enableTapToPlay?: boolean;
 }
 
 /**
@@ -17,68 +20,75 @@ interface PostVideoProps {
  * Includes thumbnail fallback when paused
  * Optimized for 4:5 aspect ratio and visibility-based autoplay/pause
  */
-export const PostVideo = React.memo<PostVideoProps>(({video, paused = false, isVisible = true}) => {
-  const getVideoSource = (uri: string | number) => {
-    if (typeof uri === 'string') {
-      return {uri};
-    }
-    return uri as any;
-  };
+export const PostVideo = React.memo<PostVideoProps>(
+  ({video, paused = false, isVisible = true, showPlayButton, showTimer, enableTapToPlay}) => {
+    const getVideoSource = (uri: string | number) => {
+      if (typeof uri === 'string') {
+        return {uri};
+      }
+      return uri as any;
+    };
 
-  const getThumbnailSource = () => {
-    // Use video thumbnail if available, otherwise use a placeholder
-    if (video.thumbnail) {
-      return typeof video.thumbnail === 'string' ? {uri: video.thumbnail} : video.thumbnail;
-    }
-    return null;
-  };
+    const getThumbnailSource = () => {
+      // Use video thumbnail if available, otherwise use a placeholder
+      if (video.thumbnail) {
+        return typeof video.thumbnail === 'string' ? {uri: video.thumbnail} : video.thumbnail;
+      }
+      return null;
+    };
 
-  const thumbnailSource = getThumbnailSource();
+    const thumbnailSource = getThumbnailSource();
 
-  // Determine if video should be paused based on visibility
-  // Video should be paused if:
-  // 1. Explicitly paused via prop, OR
-  // 2. Post is not visible
-  const shouldPause = paused || !isVisible;
+    // Determine if video should be paused based on visibility
+    // Video should be paused if:
+    // 1. Explicitly paused via prop, OR
+    // 2. Post is not visible
+    const shouldPause = paused || !isVisible;
 
-  // Enable tap to play when visible (allows user to manually play/pause)
-  // When visible and not explicitly paused, video should autoplay
-  const enableTapToPlay = isVisible;
+    // Enable tap to play when visible (allows user to manually play/pause)
+    // When visible and not explicitly paused, video should autoplay
+    // Allow override via prop (for search grid where we don't want tap-to-play)
+    const shouldEnableTapToPlay = enableTapToPlay !== undefined ? enableTapToPlay : isVisible;
 
-  // Show play button when:
-  // 1. Video is paused (either explicitly or because not visible), OR
-  // 2. Tap to play is enabled (so user can see play button when they manually pause)
-  // This ensures play button is always visible when video is paused, including manual pauses
-  const showPlayButton = shouldPause || enableTapToPlay;
+    // Show play button when:
+    // 1. Video is paused (either explicitly or because not visible), OR
+    // 2. Tap to play is enabled (so user can see play button when they manually pause)
+    // This ensures play button is always visible when video is paused, including manual pauses
+    // Allow override via prop (for search grid where we don't want play buttons)
+    const shouldShowPlayButton =
+      showPlayButton !== undefined ? showPlayButton : shouldPause || shouldEnableTapToPlay;
 
-  // Show timer only when visible and playing (not paused)
-  const showTimer = isVisible && !shouldPause;
+    // Show timer only when visible and playing (not paused)
+    // Allow override via prop (for search grid where we want timers even when paused)
+    const shouldShowTimer =
+      showTimer !== undefined ? showTimer : isVisible && !shouldPause;
 
-  return (
-    <View style={styles.container}>
-      {/* Thumbnail fallback (shown behind video when paused) */}
-      {thumbnailSource && shouldPause && (
-        <FastImage
-          source={thumbnailSource}
-          style={styles.thumbnail}
-          resizeMode={FastImage.resizeMode.cover}
+    return (
+      <View style={styles.container} pointerEvents={shouldEnableTapToPlay ? 'auto' : 'none'}>
+        {/* Thumbnail fallback (shown behind video when paused) */}
+        {thumbnailSource && shouldPause && (
+          <FastImage
+            source={thumbnailSource}
+            style={styles.thumbnail}
+            resizeMode={FastImage.resizeMode.cover}
+            pointerEvents="none"
+          />
+        )}
+        {/* Always render video component for smooth transitions */}
+        {/* CustomVideo handles paused state internally for memory optimization */}
+        <CustomVideo
+          source={getVideoSource(video.uri)}
+          paused={shouldPause}
+          style={styles.video}
+          duration={video.duration}
+          showTimer={shouldShowTimer}
+          enableTapToPlay={shouldEnableTapToPlay}
+          showPlayButton={shouldShowPlayButton}
+          muted={false}
+          repeat={true}
         />
-      )}
-      {/* Always render video component for smooth transitions */}
-      {/* CustomVideo handles paused state internally for memory optimization */}
-      <CustomVideo
-        source={getVideoSource(video.uri)}
-        paused={shouldPause}
-        style={styles.video}
-        duration={video.duration}
-        showTimer={showTimer}
-        enableTapToPlay={enableTapToPlay}
-        showPlayButton={showPlayButton}
-        muted={false}
-        repeat={true}
-      />
-    </View>
-  );
+      </View>
+    );
 });
 
 PostVideo.displayName = 'PostVideo';

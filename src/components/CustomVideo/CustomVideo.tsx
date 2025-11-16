@@ -362,12 +362,16 @@ export const CustomVideo = React.memo(
             hideSettingButton: true,
           }}
           style={StyleSheet.absoluteFill}
-          pointerEvents={enableTapToPlay ? 'none' : 'auto'}
+          pointerEvents="none"
         />
       );
 
+      // When enableTapToPlay is false, set pointerEvents="none" on container
+      // so touches pass through to parent (e.g., TouchableOpacity in MediaGridItem)
+      const containerPointerEvents = enableTapToPlay ? 'auto' : 'none';
+
       return (
-        <View style={[styles.container, style]}>
+        <View style={[styles.container, style]} pointerEvents={containerPointerEvents}>
           {videoElement}
           {shouldShowTimer && (
             <View style={styles.timerContainer} pointerEvents="none">

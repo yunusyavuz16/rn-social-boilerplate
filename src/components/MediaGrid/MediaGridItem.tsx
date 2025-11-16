@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Pressable} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import {ImageWithThumbnail} from '@components/ImageWithThumbnail/ImageWithThumbnail';
 import {PostVideo} from '@components/PostVideo/PostVideo';
 import {styles} from './MediaGridItem.styles';
@@ -9,11 +9,12 @@ import type {MediaGridItemProps} from './MediaGridItemProps';
  * Individual media grid item component
  * Videos auto-play when visible
  * Uses progressive image loading and optimized video player
+ * All child components have pointerEvents="none" to allow parent TouchableOpacity to handle presses
  */
 export const MediaGridItem = React.memo<MediaGridItemProps>(
   ({item, isVisible, onPress}) => {
     const content = (
-      <View style={styles.container}>
+      <View style={styles.container} pointerEvents="none">
         {item.type === 'image' ? (
           <ImageWithThumbnail
             uri={item.uri}
@@ -22,16 +23,28 @@ export const MediaGridItem = React.memo<MediaGridItemProps>(
             resizeMode="cover"
           />
         ) : (
-          <PostVideo video={item} paused={!isVisible} />
+          <PostVideo
+            video={item}
+            paused={!isVisible}
+            isVisible={false}
+            showPlayButton={false}
+            showTimer={true}
+            enableTapToPlay={false}
+          />
         )}
       </View>
     );
 
     if (onPress) {
       return (
-        <Pressable onPress={onPress} style={styles.pressable}>
+        <TouchableOpacity
+          onPress={onPress}
+          style={styles.pressable}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={`View post with ${item.type}`}>
           {content}
-        </Pressable>
+        </TouchableOpacity>
       );
     }
 
