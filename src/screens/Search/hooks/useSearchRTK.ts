@@ -1,6 +1,6 @@
 import { useGetPostsQuery, useLazySearchPostsQuery } from '@store/api/postsApi';
 import { useEffect, useState } from 'react';
-import type { MediaItem, Post } from '../types/post.types';
+import type { MediaItem, Post } from '../../../types/post.types';
 
 interface UseSearchRTKReturn {
   media: MediaItem[];

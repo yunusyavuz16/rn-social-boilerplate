@@ -1,4 +1,4 @@
-import { CustomVideo } from '@components/CustomVideo';
+import { CustomVideo } from '@components/CustomVideo/CustomVideo';
 import { useTheme } from '@hooks/useTheme';
 import React from 'react';
 import { View } from 'react-native';

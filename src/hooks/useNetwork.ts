@@ -6,12 +6,6 @@ import {setNetworkState} from '@store/slices/networkSlice';
 import {selectIsOnline, selectNetworkState} from '@store/slices/networkSlice';
 import type {RootState} from '@store/store';
 
-/**
- * Hook to access and monitor network state
- * Automatically initializes network monitoring and subscribes to changes
- *
- * @returns Network state and helper functions
- */
 export const useNetwork = () => {
   const dispatch = useDispatch();
   const isOnline = useSelector(selectIsOnline);
@@ -59,19 +53,8 @@ export const useNetwork = () => {
   }, []);
 
   return {
-    /**
-     * Whether device is currently online
-     */
     isOnline,
-
-    /**
-     * Full network state object
-     */
     networkState,
-
-    /**
-     * Whether network monitoring is initialized
-     */
     isInitialized: networkState !== null,
   };
 };

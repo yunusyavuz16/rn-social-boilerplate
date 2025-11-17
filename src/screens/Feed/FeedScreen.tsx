@@ -1,3 +1,4 @@
+import { useFeedRTK } from '@/screens/Feed/hooks/useFeedRTK';
 import { EmptyState } from '@components/EmptyState/EmptyState';
 import { FeedHeader } from '@components/FeedHeader/FeedHeader';
 import { Post } from '@components/Post/Post';
@@ -5,7 +6,6 @@ import { PostSkeleton } from '@components/Skeleton/Skeleton';
 import { ThemedText } from '@components/ThemedText/ThemedText';
 import { ThemedView } from '@components/ThemedView/ThemedView';
 import { useBreakpoint } from '@hooks/useBreakpoint';
-import { useFeedRTK } from '@hooks/useFeedRTK';
 import { useImagePrefetch } from '@hooks/useImagePrefetch';
 import { useMediaPlayerVisibility } from '@hooks/useMediaPlayerVisibility';
 import { useTheme } from '@hooks/useTheme';
@@ -13,7 +13,13 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { getResponsiveSpacing } from '@styles/theme';
 import React, { useCallback, useEffect, useRef } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, View, useWindowDimensions } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { RootStackParamList } from '../../navigation/types';
 import type { Post as PostType } from '../../types/post.types';
@@ -67,12 +73,9 @@ export const FeedScreen: React.FC = () => {
     navigation.navigate('Profile');
   };
 
-  const handleLike = useCallback(
-    (postId: string) => {
-      toggleLike(postId);
-    },
-    [],
-  );
+  const handleLike = useCallback((postId: string) => {
+    toggleLike(postId);
+  }, []);
 
   const handleEndReached = () => {
     if (hasMore && !isLoadingMore) {
@@ -96,7 +99,6 @@ export const FeedScreen: React.FC = () => {
   }, [posts]);
 
   const renderPost = ({ item, index }: { item: PostType; index: number }) => {
-    // Pause videos for posts that are not visible (memory optimization)
     const isVisible = isItemVisible(index);
     return (
       <View style={numColumns > 1 ? { width: postWidth } : undefined}>
@@ -119,13 +121,7 @@ export const FeedScreen: React.FC = () => {
     );
   };
 
-  const keyExtractor = (item: PostType, index: number) => {
-    // Use post ID as key - deduplication in useFeedRTK ensures uniqueness
-    // Fallback to index only if ID is missing (should never happen)
-    if (!item?.id) {
-      console.warn(`Post at index ${index} missing ID, using fallback key`);
-      return `post_fallback_${index}`;
-    }
+  const keyExtractor = (item: PostType) => {
     return item.id;
   };
 
@@ -141,6 +137,7 @@ export const FeedScreen: React.FC = () => {
     if (!isLoadingMore) {
       return null;
     }
+
     return (
       <ThemedView style={styles.footerLoader}>
         <ActivityIndicator size="small" color={theme.colors.primary} />

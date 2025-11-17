@@ -1,6 +1,6 @@
 import { useGetPostsQuery, useToggleLikeMutation } from '@store/api/postsApi';
 import { useEffect, useState } from 'react';
-import type { Post } from '../types/post.types';
+import type { Post } from '../../../types/post.types';
 
 interface UseFeedRTKReturn {
   posts: Post[];

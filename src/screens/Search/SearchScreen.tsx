@@ -5,7 +5,7 @@ import { SearchBar } from '@components/SearchBar/SearchBar';
 import { GridSkeleton } from '@components/Skeleton/Skeleton';
 import { ThemedView } from '@components/ThemedView/ThemedView';
 import { useBreakpoint } from '@hooks/useBreakpoint';
-import { useSearchRTK } from '@hooks/useSearchRTK';
+import { useSearchRTK } from '@/screens/Search/hooks/useSearchRTK';
 import { useTheme } from '@hooks/useTheme';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useRef, useState } from 'react';
