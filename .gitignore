@@ -83,3 +83,5 @@ package-lock.json
 npmcache
 
 Podfile.lock
+.scannerwork
+sonar-project.properties

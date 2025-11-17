@@ -1,4 +1,3 @@
-import { ImageWithThumbnail } from '@/components/Organisms/ImageWithThumbnail/ImageWithThumbnail';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { useTheme } from '@hooks/useTheme';
 import React, { useEffect } from 'react';
@@ -9,6 +8,7 @@ import type { MediaItem } from '../../../types/post.types';
 import { useMediaCarousel } from './hooks/useMediaCarousel';
 import { PaginationDotComponent } from './PaginationDot';
 import { createStyles } from './PostImageCarousel.styles';
+import { ImageWithThumbnail } from '@/components/Molecules/ImageWithThumbnail/ImageWithThumbnail';
 
 interface PostImageCarouselProps {
   media: MediaItem[];

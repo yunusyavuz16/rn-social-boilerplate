@@ -1,10 +1,10 @@
-import { useProgressiveImage } from '@/components/Organisms/ImageWithThumbnail/hooks/useProgressiveImage';
 import { Theme } from '@/styles/theme';
 import { useTheme } from '@hooks/useTheme';
 import { CachePriority, imageCacheService } from '@services/imageCacheService';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View, ViewStyle } from 'react-native';
 import FastImage, { type ResizeMode } from 'react-native-fast-image';
+import { useProgressiveImage } from './hooks/useProgressiveImage';
 import { getCacheMode } from './utils/imageUtils';
 
 interface ImageWithThumbnailProps {

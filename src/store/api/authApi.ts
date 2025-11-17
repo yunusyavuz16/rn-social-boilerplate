@@ -1,14 +1,14 @@
-import { authService } from '@services/authService';
-import { secureStorageService } from '@services/secureStorageService';
-import type { LoginCredentials, User } from '../../types/auth.types';
-import { baseApi } from './baseApi';
+import {authService} from '@services/authService';
+import {secureStorageService} from '@services/secureStorageService';
+import type {AuthSession, LoginCredentials} from '../../types/auth.types';
+import {baseApi} from './baseApi';
 
 interface LoginParams {
   credentials: LoginCredentials;
 }
 
 interface CheckAuthResponse {
-  user: User | null;
+  session: AuthSession | null;
 }
 
 /**
@@ -20,22 +20,18 @@ export const authApi = baseApi.injectEndpoints({
     /**
      * Login mutation
      */
-    login: builder.mutation<User, LoginParams>({
+    login: builder.mutation<AuthSession, LoginParams>({
       queryFn: async ({ credentials }) => {
         try {
-          const user = await authService.login(credentials);
-          // Store credentials securely (non-blocking - login succeeds even if storage fails)
-          // This allows the app to work on emulators without biometric authentication
-          const storageSuccess = await secureStorageService.storeCredentials(
-            credentials.username,
-            credentials.password,
+          const session = await authService.login(credentials);
+          const storageSuccess = await secureStorageService.storeRefreshToken(
+            session.tokens.refreshToken,
           );
           if (!storageSuccess) {
-            // Log warning but don't fail login
-            console.warn('Could not store credentials securely, but login succeeded');
+            console.warn('Could not store refresh token securely');
           }
           return {
-            data: user,
+            data: session,
           };
         } catch (error) {
           return {
@@ -56,7 +52,7 @@ export const authApi = baseApi.injectEndpoints({
       queryFn: async () => {
         try {
           await authService.logout();
-          await secureStorageService.clearCredentials();
+          await secureStorageService.clearRefreshToken();
           // Return null for mutations that don't return meaningful data
           return {
             data: null,
@@ -79,19 +75,23 @@ export const authApi = baseApi.injectEndpoints({
     checkAuth: builder.query<CheckAuthResponse, void>({
       queryFn: async () => {
         try {
-          const credentials = await secureStorageService.getCredentials();
-          if (credentials) {
-            const user = await authService.login(credentials);
+          const refreshToken = await secureStorageService.getRefreshToken();
+          if (refreshToken) {
+            const session = await authService.refreshSession(refreshToken);
+            await secureStorageService.storeRefreshToken(
+              session.tokens.refreshToken,
+            );
             return {
-              data: { user },
+              data: { session },
             };
           }
           return {
-            data: { user: null },
+            data: { session: null },
           };
-        } catch {
+        } catch (error) {
+          console.warn('Refresh token invalid or expired', error);
           return {
-            data: { user: null }, // Return null on error, don't throw
+            data: { session: null }, // Return null on error, don't throw
           };
         }
       },
@@ -100,4 +100,4 @@ export const authApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useLoginMutation, useLogoutMutation, useCheckAuthQuery } = authApi;
+export const {useLoginMutation, useLogoutMutation, useCheckAuthQuery} = authApi;

@@ -10,8 +10,20 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+}
+
+export interface AuthSession {
+  user: User;
+  tokens: AuthTokens;
+}
+
 export interface AuthState {
   user: User | null;
+  accessToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
 }

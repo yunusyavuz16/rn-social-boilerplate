@@ -9,12 +9,6 @@ import {STORAGE_KEYS} from '@constants/storage.constants';
 class SecureStorageService {
   private readonly service = 'StoikkKeychain';
 
-  /**
-   * Store an item securely
-   * Returns true if successful, false if failed (non-blocking)
-   * Note: react-native-keychain is designed for username/password pairs
-   * For generic key-value storage, we use the username field as key and password field as value
-   */
   async setItem(key: string, value: string): Promise<boolean> {
     try {
       await Keychain.setGenericPassword(key, value, {
@@ -28,10 +22,6 @@ class SecureStorageService {
     }
   }
 
-  /**
-   * Retrieve an item from secure storage
-   * Returns null if item doesn't exist (normal case, not an error)
-   */
   async getItem(key: string): Promise<string | null> {
     try {
       const credentials = await Keychain.getGenericPassword({
@@ -57,10 +47,6 @@ class SecureStorageService {
     }
   }
 
-  /**
-   * Remove an item from secure storage
-   * Silently succeeds if item doesn't exist
-   */
   async removeItem(key: string): Promise<void> {
     try {
       // Check if the item exists with this key
@@ -79,12 +65,6 @@ class SecureStorageService {
     }
   }
 
-  /**
-   * Store user credentials securely
-   * Returns true if successful, false if failed (non-blocking)
-   * This allows login to succeed even if storage fails
-   * Uses react-native-keychain's native username/password storage
-   */
   async storeCredentials(
     username: string,
     password: string,
@@ -101,9 +81,6 @@ class SecureStorageService {
     }
   }
 
-  /**
-   * Get user credentials from secure storage
-   */
   async getCredentials(): Promise<{username: string; password: string} | null> {
     try {
       const credentials = await Keychain.getGenericPassword({
@@ -126,18 +103,28 @@ class SecureStorageService {
     }
   }
 
-  /**
-   * Clear user credentials
-   */
   async clearCredentials(): Promise<void> {
     try {
       await Keychain.resetGenericPassword({service: this.service});
       // Also try to clear any legacy items if they exist
       await this.removeItem(STORAGE_KEYS.USER_DATA);
+      await this.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
     } catch (error) {
       // Log but don't throw - clearing is best effort
       console.error('Error clearing credentials:', error);
     }
+  }
+
+  async storeRefreshToken(token: string): Promise<boolean> {
+    return this.setItem(STORAGE_KEYS.REFRESH_TOKEN, token);
+  }
+
+  async getRefreshToken(): Promise<string | null> {
+    return this.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+  }
+
+  async clearRefreshToken(): Promise<void> {
+    await this.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
   }
 }
 

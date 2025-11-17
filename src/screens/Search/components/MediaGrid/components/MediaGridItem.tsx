@@ -1,4 +1,3 @@
-import { getCacheMode } from '@/components/Organisms/ImageWithThumbnail/utils/imageUtils';
 import { PostVideo } from '@/components/Organisms/PostVideo/PostVideo';
 import { useTheme } from '@hooks/useTheme';
 import { CachePriority, imageCacheService } from '@services/imageCacheService';
@@ -7,6 +6,7 @@ import { View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { createStyles } from './MediaGridItem.styles';
 import type { MediaGridItemProps } from './MediaGridItemProps';
+import { getCacheMode } from '@/components/Molecules/ImageWithThumbnail/utils/imageUtils';
 
 export const MediaGridItem: React.FC<MediaGridItemProps> = React.memo(
   ({ id, type, uri, thumbnail, duration, isVisible }) => {

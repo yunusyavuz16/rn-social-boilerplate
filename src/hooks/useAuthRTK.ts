@@ -1,11 +1,12 @@
 import {useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '@store/hooks';
 import {useCheckAuthQuery, useLoginMutation, useLogoutMutation} from '@store/api/authApi';
-import {setUser, setLoading, logout as logoutAction} from '@store/slices/authSlice';
-import type {LoginCredentials} from '../types/auth.types';
+import {setSession, clearSession, setLoading} from '@store/slices/authSlice';
+import type {LoginCredentials, User} from '../types/auth.types';
 
 interface UseAuthRTKReturn {
-  user: ReturnType<typeof useAppSelector<{auth: {user: any}}>>['auth']['user'];
+  user: User | null;
+  accessToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -17,7 +18,7 @@ interface UseAuthRTKReturn {
  */
 export const useAuthRTK = (): UseAuthRTKReturn => {
   const dispatch = useAppDispatch();
-  const {user, isAuthenticated, isLoading} = useAppSelector(state => state.auth);
+  const {user, accessToken, isAuthenticated, isLoading} = useAppSelector(state => state.auth);
 
   // Check auth on mount
   const {data: checkAuthData, isLoading: isCheckingAuth} = useCheckAuthQuery();
@@ -27,20 +28,36 @@ export const useAuthRTK = (): UseAuthRTKReturn => {
   // Update auth state from checkAuth query
   useEffect(() => {
     if (checkAuthData) {
-      dispatch(setUser(checkAuthData.user));
+      if (checkAuthData.session) {
+        dispatch(
+          setSession({
+            user: checkAuthData.session.user,
+            accessToken: checkAuthData.session.tokens.accessToken,
+          }),
+        );
+      } else {
+        dispatch(clearSession());
+      }
       dispatch(setLoading(false));
     }
-  }, [checkAuthData, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkAuthData]);
 
   // Update loading state
   useEffect(() => {
     dispatch(setLoading(isCheckingAuth || isLoggingIn || isLoggingOut));
-  }, [isCheckingAuth, isLoggingIn, isLoggingOut, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCheckingAuth, isLoggingIn, isLoggingOut]);
 
   const login = async (credentials: LoginCredentials) => {
     try {
-      const userData = await loginMutation({credentials}).unwrap();
-      dispatch(setUser(userData));
+      const session = await loginMutation({credentials}).unwrap();
+      dispatch(
+        setSession({
+          user: session.user,
+          accessToken: session.tokens.accessToken,
+        }),
+      );
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -50,7 +67,7 @@ export const useAuthRTK = (): UseAuthRTKReturn => {
   const logout = async () => {
     try {
       await logoutMutation().unwrap();
-      dispatch(logoutAction());
+      dispatch(clearSession());
     } catch (error) {
       console.error('Logout failed:', error);
       throw error;
@@ -59,6 +76,7 @@ export const useAuthRTK = (): UseAuthRTKReturn => {
 
   return {
     user,
+    accessToken,
     isAuthenticated,
     isLoading,
     login,
