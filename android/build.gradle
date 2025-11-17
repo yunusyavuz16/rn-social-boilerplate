@@ -19,3 +19,61 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+subprojects { subproject ->
+    if (subproject.name == "react-native-reanimated") {
+        subproject.afterEvaluate {
+            def workletsProject = rootProject.findProject(":react-native-worklets")
+            if (workletsProject != null) {
+                tasks.matching { it.name.startsWith("configureCMake") }.configureEach { configureTask ->
+                    def dependencyTaskName = configureTask.name.contains("RelWithDebInfo") ? "prefabReleasePackage" : "prefabDebugPackage"
+                    def dependencyTask = workletsProject.tasks.findByName(dependencyTaskName)
+                    if (dependencyTask != null) {
+                        configureTask.dependsOn(dependencyTask)
+                    }
+                }
+            }
+        }
+    }
+
+    if (subproject.name == "react-native-screens") {
+        subproject.afterEvaluate {
+            ["debug", "release"].each { variant ->
+                def capitalizedVariant = variant.capitalize()
+                tasks.matching { it.name == "compile${capitalizedVariant}JavaWithJavac" }.configureEach { compileTask ->
+                    def preCompileTask = tasks.findByName("javaPreCompile${capitalizedVariant}")
+                    if (preCompileTask != null) {
+                        compileTask.dependsOn(preCompileTask)
+                    }
+                    compileTask.doFirst {
+                        def processorsFile = new File(subproject.buildDir, "intermediates/annotation_processor_list/${variant}/javaPreCompile${capitalizedVariant}/annotationProcessors.json")
+                        if (!processorsFile.exists()) {
+                            processorsFile.parentFile.mkdirs()
+                            processorsFile.text = "[]"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+gradle.projectsEvaluated {
+    tasks.matching { it.name.startsWith("configureCMake") }.configureEach { configureTask ->
+        def reanimatedProject = rootProject.findProject(":react-native-reanimated")
+        def workletsProject = rootProject.findProject(":react-native-worklets")
+        if (reanimatedProject != null && workletsProject != null) {
+            if (configureTask.name.contains("RelWithDebInfo")) {
+                configureTask.dependsOn(
+                    reanimatedProject.tasks.named("prefabReleasePackage"),
+                    workletsProject.tasks.named("prefabReleasePackage")
+                )
+            } else {
+                configureTask.dependsOn(
+                    reanimatedProject.tasks.named("prefabDebugPackage"),
+                    workletsProject.tasks.named("prefabDebugPackage")
+                )
+            }
+        }
+    }
+}

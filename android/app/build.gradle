@@ -119,3 +119,20 @@ dependencies {
 }
 
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+
+gradle.projectsEvaluated {
+    tasks.matching { it.name.startsWith("configureCMake") }.configureEach { configureTask ->
+        def isReleaseLike = configureTask.name.contains("RelWithDebInfo") || configureTask.name.toLowerCase().contains("release")
+        if (isReleaseLike) {
+            configureTask.dependsOn(
+                rootProject.project(":react-native-reanimated").tasks.named("prefabReleasePackage"),
+                rootProject.project(":react-native-worklets").tasks.named("prefabReleasePackage")
+            )
+        } else {
+            configureTask.dependsOn(
+                rootProject.project(":react-native-reanimated").tasks.named("prefabDebugPackage"),
+                rootProject.project(":react-native-worklets").tasks.named("prefabDebugPackage")
+            )
+        }
+    }
+}
