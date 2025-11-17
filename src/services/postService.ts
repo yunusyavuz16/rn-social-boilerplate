@@ -1,107 +1,45 @@
 import { API_CONFIG } from '@constants/api.constants';
+import {
+  CAPTIONS,
+  IMAGE_THUMBNAILS,
+  IMAGE_URIS,
+  USERNAMES,
+  VIDEO_DURATIONS,
+  VIDEO_THUMBNAILS,
+  VIDEO_URIS,
+} from '@constants/post.constants';
 import type { MediaItem, Post, PostType } from '../types/post.types';
 
-/**
- * Video asset with duration information
- */
+
 interface VideoAsset {
   uri: string | number;
   duration: number;
   thumbnail: string | number;
 }
 
-/**
- * Image asset with its corresponding thumbnail
- */
 interface ImageAsset {
   uri: string | number;
   thumbnail: string | number;
 }
 
-/**
- * Video duration mapping (in seconds)
- * Based on predefined video durations
- * Index corresponds to video-1 through video-10
- */
-const VIDEO_DURATIONS: number[] = [12, 8.5, 14, 13.3, 7.9, 8.4, 5.8, 10.3, 7.5, 7.1];
 
-/**
- * Mock post service
- * Generates mock posts with exactly 2 images (swipeable carousel) or 1 video
- */
+
+
 class PostService {
-  /**
-   * Get all image assets with their corresponding thumbnails
-   * Returns an array of objects containing uri and thumbnail
-   */
+
   public getAllImageAssets(): ImageAsset[] {
-    const images = [
-      require('../assets/images/image-1.png'),
-      require('../assets/images/image-2.png'),
-      require('../assets/images/image-3.png'),
-      require('../assets/images/image-4.png'),
-      require('../assets/images/image-5.png'),
-      require('../assets/images/image-6.png'),
-      require('../assets/images/image-7.png'),
-      require('../assets/images/image-8.png'),
-      require('../assets/images/image-9.png'),
-      require('../assets/images/image-10.png'),
-    ];
-
-    const thumbnails = [
-      require('../assets/thumbnail-images/image-1.png'),
-      require('../assets/thumbnail-images/image-2.png'),
-      require('../assets/thumbnail-images/image-3.png'),
-      require('../assets/thumbnail-images/image-4.png'),
-      require('../assets/thumbnail-images/image-5.png'),
-      require('../assets/thumbnail-images/image-6.png'),
-      require('../assets/thumbnail-images/image-7.png'),
-      require('../assets/thumbnail-images/image-8.png'),
-      require('../assets/thumbnail-images/image-9.png'),
-      require('../assets/thumbnail-images/image-10.png'),
-    ];
-
-    return images.map((uri, index) => ({
+    return IMAGE_URIS.map((uri, index) => ({
       uri,
-      thumbnail: thumbnails[index],
+      thumbnail: IMAGE_THUMBNAILS[index],
     }));
   }
 
-  /**
-   * Get all video assets with their durations
-   * Returns an array of objects containing uri and duration
-   */
+
   public getAllVideoAssets(): VideoAsset[] {
-    const videoUris = [
-      require('../assets/videos/video-1.mp4'),
-      require('../assets/videos/video-2.mp4'),
-      require('../assets/videos/video-3.mp4'),
-      require('../assets/videos/video-4.mp4'),
-      require('../assets/videos/video-5.mp4'),
-      require('../assets/videos/video-6.mp4'),
-      require('../assets/videos/video-7.mp4'),
-      require('../assets/videos/video-8.mp4'),
-      require('../assets/videos/video-9.mp4'),
-      require('../assets/videos/video-10.mp4'),
-    ];
-
-    const thumbnails = [
-      require('../assets/thumbnail-videos/video-1.png'),
-      require('../assets/thumbnail-videos/video-2.png'),
-      require('../assets/thumbnail-videos/video-3.png'),
-      require('../assets/thumbnail-videos/video-4.png'),
-      require('../assets/thumbnail-videos/video-5.png'),
-      require('../assets/thumbnail-videos/video-6.png'),
-      require('../assets/thumbnail-videos/video-7.png'),
-      require('../assets/thumbnail-videos/video-8.png'),
-      require('../assets/thumbnail-videos/video-9.png'),
-      require('../assets/thumbnail-videos/video-10.png'),
-    ];
-
-    return videoUris.map((uri, index) => ({
+    return VIDEO_URIS.map((uri, index) => ({
       uri,
       duration: VIDEO_DURATIONS[index],
-      thumbnail: thumbnails[index],
+      thumbnail: VIDEO_THUMBNAILS[index],
     }));
   }
 
@@ -116,29 +54,6 @@ class PostService {
 
   private generateMockPosts(page: number = 1, limit: number = 10): Post[] {
     const posts: Post[] = [];
-    const usernames = [
-      'johndoe',
-      'janedoe',
-      'photographer',
-      'traveler',
-      'artist',
-      'explorer',
-      'creator',
-      'wanderer',
-    ];
-    const captions = [
-      'Beautiful sunset today! 🌅',
-      'Exploring new places',
-      'Life is beautiful',
-      'Nature never fails to amaze',
-      'Living the moment',
-      'Adventure awaits',
-      'Making memories',
-      'Chasing dreams',
-      'Every moment is a new beginning',
-      'Finding beauty in simplicity',
-    ];
-
     const allImages = this.getAllImageAssets();
     const allVideos = this.getAllVideoAssets();
     const startIndex = (page - 1) * limit;
@@ -146,7 +61,7 @@ class PostService {
     // Generate posts with exactly 2 images or 1 video
     for (let i = 0; i < limit; i++) {
       const postIndex = startIndex + i;
-      const username = usernames[postIndex % usernames.length];
+      const username = USERNAMES[postIndex % USERNAMES.length];
       let media: MediaItem[] = [];
       let postTypeName: PostType = 'images';
 
@@ -197,7 +112,7 @@ class PostService {
         userAvatar: undefined,
         type: postTypeName,
         media,
-        caption: captions[postIndex % captions.length],
+        caption: CAPTIONS[postIndex % CAPTIONS.length],
         likes: Math.floor(Math.random() * 1000) + 50,
         comments: Math.floor(Math.random() * 100) + 5,
         timestamp: Date.now() - postIndex * 3600000,

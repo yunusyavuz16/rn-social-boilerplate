@@ -20,7 +20,7 @@ export const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.primary,
     },
     initials: {
-      color: theme.colors.white,
+      color: theme.mode === 'dark' ? theme.colors.black : theme.colors.white,
       fontWeight: theme.typography.fontWeight.bold,
     },
   });

@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface UseVideoControlsParams {
   pausedProp: boolean;
@@ -51,7 +51,7 @@ export const useVideoControls = ({
 
   const actualPaused = enableTapToPlay ? internalPaused : pausedProp;
 
-  const handleTap = useCallback(() => {
+  const handleTap = () => {
     if (hasError) {
       onErrorReset();
       if (!pausedProp) {
@@ -69,22 +69,19 @@ export const useVideoControls = ({
       userPausedRef.current = next;
       return next;
     });
-  }, [enableTapToPlay, hasError, onErrorReset, pausedProp]);
+  };
 
-  const syncWithAutoplay = useCallback(() => {
+  const syncWithAutoplay = () => {
     if (!enableTapToPlay || pausedProp || userPausedRef.current) {
       return;
     }
 
     setInternalPaused(false);
-  }, [enableTapToPlay, pausedProp]);
+  };
 
   const containerPointerEvents = enableTapToPlay ? 'auto' : 'none';
 
-  const shouldShowPlayButton = useMemo(
-    () => hasError || (actualPaused && (enableTapToPlay || showPlayButton)),
-    [actualPaused, enableTapToPlay, hasError, showPlayButton],
-  );
+  const shouldShowPlayButton = hasError || (actualPaused && (enableTapToPlay || showPlayButton));
 
   return {
     actualPaused,
@@ -95,4 +92,3 @@ export const useVideoControls = ({
     syncWithAutoplay,
   };
 };
-

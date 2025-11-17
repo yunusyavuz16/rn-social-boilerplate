@@ -1,34 +1,19 @@
 import FastImage, {Priority} from 'react-native-fast-image';
 
-/**
- * Cache mode for FastImage
- * - immutable: Image will never change, cache forever
- * - web: Use web cache headers
- * - cacheOnly: Only use cached images, don't fetch
- */
+
 export type CacheMode = 'immutable' | 'web' | 'cacheOnly';
 
-/**
- * Image cache priority levels
- */
 export enum CachePriority {
   LOW = 'low',
   NORMAL = 'normal',
   HIGH = 'high',
 }
 
-/**
- * Image cache service
- * Manages image caching, prefetching, and cache clearing
- * Provides utilities for optimal image loading performance
- */
+
 class ImageCacheService {
   private readonly prefetchedImages = new Set<string>();
   private readonly prefetchedThumbnails = new Set<string>();
 
-  /**
-   * Get cache priority for FastImage
-   */
   private getCachePriority(priority: CachePriority = CachePriority.NORMAL): Priority {
     switch (priority) {
       case CachePriority.LOW:
@@ -40,12 +25,6 @@ class ImageCacheService {
     }
   }
 
-  /**
-   * Prefetch a single image with optional thumbnail
-   * @param uri - Image URI (string URL or require() number)
-   * @param thumbnailUri - Optional thumbnail URI
-   * @param priority - Cache priority (default: normal)
-   */
   prefetchImage(
     uri: string | number,
     thumbnailUri?: string | number,
@@ -69,7 +48,6 @@ class ImageCacheService {
       }
     }
 
-    // Prefetch full image
     if (typeof uri === 'string') {
       const imageKey = uri;
       if (!this.prefetchedImages.has(imageKey)) {
@@ -88,11 +66,7 @@ class ImageCacheService {
     }
   }
 
-  /**
-   * Prefetch multiple images with optional thumbnails
-   * @param items - Array of {uri, thumbnailUri?} objects
-   * @param priority - Cache priority (default: normal)
-   */
+
   prefetchImages(
     items: Array<{uri: string | number; thumbnailUri?: string | number}>,
     priority: CachePriority = CachePriority.NORMAL,

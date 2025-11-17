@@ -1,6 +1,4 @@
-/**
- * Icon name constants for consistent usage
- */
+
 export const ICONS = {
   // Actions
   HEART: 'heart',

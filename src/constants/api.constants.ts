@@ -1,6 +1,3 @@
-/**
- * API related constants
- */
 
 export const API_CONFIG = {
   MOCK_DELAY: 500, // Simulated API delay in milliseconds

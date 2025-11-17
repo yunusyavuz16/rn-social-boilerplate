@@ -8,7 +8,7 @@ import { AvatarProps } from './AvatarProps';
 /**
  * Avatar component for user profile pictures
  */
-export const Avatar:React.FC<AvatarProps> = ({ uri, username, size = 32 }) => {
+export const Avatar: React.FC<AvatarProps> = ({ uri, username, size = 32 }) => {
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
