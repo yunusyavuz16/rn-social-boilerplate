@@ -16,22 +16,6 @@ interface ImageWithThumbnailProps {
   onError?: () => void;
 }
 
-/**
- * Progressive image loading component
- *
- * Features:
- * - Always displays thumbnail first when available (no black placeholders)
- * - Smooth transition from thumbnail → full image
- * - Optimized caching with proper priority levels
- * - Handles all edge cases (missing thumbnail, errors, local assets, URLs)
- * - No flickering or blank frames
- *
- * Rendering strategy:
- * 1. Thumbnail layer (z-index: 2) - shown until full image loads
- * 2. Full image layer (z-index: 1) - loads in background
- * 3. Loading indicator (z-index: 3) - only shown if no thumbnail available
- * 4. Error state - shown if both thumbnail and full image fail
- */
 export const ImageWithThumbnail: React.FC<ImageWithThumbnailProps> = ({
   uri,
   thumbnailUri,

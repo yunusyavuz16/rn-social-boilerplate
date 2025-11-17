@@ -115,3 +115,5 @@ export const createStyles = (theme: Theme) =>
     },
   });
 
+export type ProfileStyles = ReturnType<typeof createStyles>;
+
