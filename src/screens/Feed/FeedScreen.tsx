@@ -6,15 +6,15 @@ import { PostSkeleton } from '@components/Skeleton/Skeleton';
 import { ThemedText } from '@components/ThemedText/ThemedText';
 import { ThemedView } from '@components/ThemedView/ThemedView';
 import { ICONS } from '@constants/icons.constants';
+import { useBreakpoint } from '@hooks/useBreakpoint';
 import { useFeedRTK } from '@hooks/useFeedRTK';
 import { useImagePrefetch } from '@hooks/useImagePrefetch';
 import { useMediaPlayerVisibility } from '@hooks/useMediaPlayerVisibility';
 import { useTheme } from '@hooks/useTheme';
-import { useBreakpoint } from '@hooks/useBreakpoint';
-import { getResponsiveSpacing } from '@styles/theme';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React, { useCallback, useEffect, useRef, useMemo } from 'react';
+import { getResponsiveSpacing } from '@styles/theme';
+import React, { useEffect, useMemo, useRef } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -68,26 +68,23 @@ export const FeedScreen: React.FC = () => {
     minimumViewTime: 200,
   });
 
-  const handleSearchFocus = useCallback(() => {
+  const handleSearchFocus = () => {
     navigation.navigate('Search');
-  }, [navigation]);
+  };
 
-  const handleProfilePress = useCallback(() => {
+  const handleProfilePress = () => {
     navigation.navigate('Profile');
-  }, [navigation]);
+  };
 
-  const handleLike = useCallback(
-    (postId: string) => {
-      toggleLike(postId);
-    },
-    [toggleLike],
-  );
+  const handleLike = (postId: string) => {
+    toggleLike(postId);
+  };
 
-  const handleEndReached = useCallback(() => {
+  const handleEndReached = () => {
     if (hasMore && !isLoadingMore) {
       loadMore();
     }
-  }, [hasMore, isLoadingMore, loadMore]);
+  };
 
   // Prefetch next posts' media when scrolling (with thumbnails)
   useEffect(() => {
@@ -96,28 +93,25 @@ export const FeedScreen: React.FC = () => {
       const mediaItems = nextPosts.flatMap(post =>
         post.media
           .filter(m => m.type === 'image')
-          .map(m => ({uri: m.uri, thumbnailUri: m.thumbnail})),
+          .map(m => ({ uri: m.uri, thumbnailUri: m.thumbnail })),
       );
       if (mediaItems.length > 0) {
         prefetchImages(mediaItems);
       }
     }
-  }, [posts, prefetchImages]);
+  }, [posts]);
 
-  const renderPost = useCallback(
-    ({ item, index }: { item: PostType; index: number }) => {
-      // Pause videos for posts that are not visible (memory optimization)
-      const isVisible = isItemVisible(index);
-      return (
-        <View style={numColumns > 1 ? { width: postWidth } : undefined}>
-          <Post post={item} onLike={handleLike} isVisible={isVisible} />
-        </View>
-      );
-    },
-    [handleLike, isItemVisible, numColumns, postWidth],
-  );
+  const renderPost = ({ item, index }: { item: PostType; index: number }) => {
+    // Pause videos for posts that are not visible (memory optimization)
+    const isVisible = isItemVisible(index);
+    return (
+      <View style={numColumns > 1 ? { width: postWidth } : undefined}>
+        <Post post={item} onLike={handleLike} isVisible={isVisible} />
+      </View>
+    );
+  };
 
-  const keyExtractor = useCallback((item: PostType, index: number) => {
+  const keyExtractor = (item: PostType, index: number) => {
     // Use post ID as key - deduplication in useFeedRTK ensures uniqueness
     // Fallback to index only if ID is missing (should never happen)
     if (!item?.id) {
@@ -125,9 +119,9 @@ export const FeedScreen: React.FC = () => {
       return `post_fallback_${index}`;
     }
     return item.id;
-  }, []);
+  };
 
-  const renderFooter = useCallback(() => {
+  const renderFooter = () => {
     if (!isLoadingMore) {
       return null;
     }
@@ -136,9 +130,9 @@ export const FeedScreen: React.FC = () => {
         <ActivityIndicator size="small" color={theme.colors.primary} />
       </ThemedView>
     );
-  }, [isLoadingMore, theme.colors.primary, styles.footerLoader]);
+  };
 
-  const renderEmpty = useCallback(() => {
+  const renderEmpty = () => {
     // Show loading skeleton during initial load
     if (isLoading) {
       return (
@@ -154,9 +148,9 @@ export const FeedScreen: React.FC = () => {
     }
     // Only show "no posts yet" when loading is complete and there are no posts
     return <EmptyState type="feed" />;
-  }, [isLoading, error, refresh, styles.emptyContainer]);
+  }
 
-  const renderEndMessage = useCallback(() => {
+  const renderEndMessage = () => {
     if (!hasMore && posts.length > 0) {
       return (
         <ThemedView style={styles.endMessage}>
@@ -165,7 +159,7 @@ export const FeedScreen: React.FC = () => {
       );
     }
     return null;
-  }, [hasMore, posts.length, styles.endMessage, styles.endMessageText]);
+  }
 
   const viewabilityConfigCallbackPairs = useRef([
     {
@@ -183,9 +177,8 @@ export const FeedScreen: React.FC = () => {
           activeOpacity={1}
           accessibilityLabel="Go to search"
           accessibilityRole="button">
-          <View pointerEvents="none" style={{flex: 1}}>
-            <SearchBar
-            />
+          <View pointerEvents="none" style={{ flex: 1 }}>
+            <SearchBar />
           </View>
         </TouchableOpacity>
         <TouchableOpacity

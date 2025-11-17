@@ -1,5 +1,4 @@
-import {useCallback} from 'react';
-import {imageCacheService, CachePriority} from '@services/imageCacheService';
+import { CachePriority, imageCacheService } from '@services/imageCacheService';
 
 interface UseImagePrefetchReturn {
   prefetchImage: (uri: string | number, thumbnailUri?: string | number, priority?: CachePriority) => void;
@@ -14,27 +13,23 @@ interface UseImagePrefetchReturn {
  * Uses centralized cache service for optimal performance
  */
 export const useImagePrefetch = (): UseImagePrefetchReturn => {
-  const prefetchImage = useCallback(
+  const prefetchImage =
     (uri: string | number, thumbnailUri?: string | number, priority: CachePriority = CachePriority.NORMAL) => {
       imageCacheService.prefetchImage(uri, thumbnailUri, priority);
-    },
-    [],
-  );
+  }
 
-  const prefetchImages = useCallback(
+  const prefetchImages =
     (items: Array<{uri: string | number; thumbnailUri?: string | number}>, priority: CachePriority = CachePriority.NORMAL) => {
       imageCacheService.prefetchImages(items, priority);
-    },
-    [],
-  );
+  }
 
-  const isPrefetched = useCallback((uri: string | number) => {
+  const isPrefetched = (uri: string | number) => {
     return imageCacheService.isPrefetched(uri);
-  }, []);
+  }
 
-  const isThumbnailPrefetched = useCallback((thumbnailUri: string | number) => {
+  const isThumbnailPrefetched = (thumbnailUri: string | number) => {
     return imageCacheService.isThumbnailPrefetched(thumbnailUri);
-  }, []);
+  }
 
   return {
     prefetchImage,

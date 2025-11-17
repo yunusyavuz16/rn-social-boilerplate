@@ -1,14 +1,12 @@
-import {useState, useCallback, useEffect, useRef} from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface UseProgressiveImageReturn {
   imageUri: string | number;
   thumbnailUri: string | number | null;
-  isThumbnailLoaded: boolean;
   isFullImageLoaded: boolean;
   hasError: boolean;
   onLoad: () => void;
   onError: () => void;
-  onThumbnailLoad: () => void;
 }
 
 /**
@@ -20,7 +18,6 @@ export const useProgressiveImage = (
   uri: string | number,
   thumbnailUri?: string | number,
 ): UseProgressiveImageReturn => {
-  const [isThumbnailLoaded, setIsThumbnailLoaded] = useState(false);
   const [isFullImageLoaded, setIsFullImageLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const previousUriRef = useRef<string | number>(uri);
@@ -32,7 +29,6 @@ export const useProgressiveImage = (
     const thumbnailChanged = previousThumbnailUriRef.current !== thumbnailUri;
 
     if (uriChanged || thumbnailChanged) {
-      setIsThumbnailLoaded(false);
       setIsFullImageLoaded(false);
       setHasError(false);
       previousUriRef.current = uri;
@@ -40,30 +36,22 @@ export const useProgressiveImage = (
     }
   }, [uri, thumbnailUri]);
 
-  const onThumbnailLoad = useCallback(() => {
-    setIsThumbnailLoaded(true);
-  }, []);
-
-  const onLoad = useCallback(() => {
+  const onLoad = () => {
     setIsFullImageLoaded(true);
     setHasError(false);
-  }, []);
+  };
 
-  const onError = useCallback(() => {
+  const onError = () => {
     setHasError(true);
-    // Note: If full image fails but thumbnail is available, thumbnail remains visible
-    // This is handled by the component's rendering logic
-  }, []);
+  };
 
   return {
     imageUri: uri,
     thumbnailUri: thumbnailUri || null,
-    isThumbnailLoaded,
     isFullImageLoaded,
     hasError,
     onLoad,
     onError,
-    onThumbnailLoad,
   };
 };
 

@@ -1,17 +1,17 @@
-import React, {useState, useCallback} from 'react';
-import {Alert, ActivityIndicator, Pressable} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
-import {useAuthRTK} from '@hooks/useAuthRTK';
-import {useTheme} from '@hooks/useTheme';
-import {ThemedView} from '@components/ThemedView/ThemedView';
-import {ThemedText} from '@components/ThemedText/ThemedText';
-import {Avatar} from '@components/Avatar/Avatar';
-import {Button} from '@components/Button/Button';
-import {BackButton} from '@components/BackButton/BackButton';
-import {createStyles} from './ProfileScreen.styles';
-import type {NavigationProp} from '../../navigation/types';
-import type {ThemeMode} from '@styles/theme';
+import { Avatar } from '@components/Avatar/Avatar';
+import { BackButton } from '@components/BackButton/BackButton';
+import { Button } from '@components/Button/Button';
+import { ThemedText } from '@components/ThemedText/ThemedText';
+import { ThemedView } from '@components/ThemedView/ThemedView';
+import { useAuthRTK } from '@hooks/useAuthRTK';
+import { useTheme } from '@hooks/useTheme';
+import { useNavigation } from '@react-navigation/native';
+import type { ThemeMode } from '@styles/theme';
+import React, { useState } from 'react';
+import { ActivityIndicator, Alert, Pressable } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import type { NavigationProp } from '../../navigation/types';
+import { createStyles } from './ProfileScreen.styles';
 
 /**
  * Profile screen displaying user information, theme switcher, and logout functionality
@@ -23,7 +23,7 @@ export const ProfileScreen: React.FC = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const styles = createStyles(theme);
 
-  const handleLogout = useCallback(() => {
+  const handleLogout = () => {
     Alert.alert(
       'Logout',
       'Are you sure you want to logout?',
@@ -50,14 +50,11 @@ export const ProfileScreen: React.FC = () => {
         },
       ],
     );
-  }, [logout, navigation]);
+  }
 
-  const handleThemeChange = useCallback(
-    async (newMode: ThemeMode) => {
-      await setTheme(newMode);
-    },
-    [setTheme],
-  );
+  const handleThemeChange = async (newMode: ThemeMode) => {
+    await setTheme(newMode);
+  }
 
   if (authLoading || !user) {
     return (

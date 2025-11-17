@@ -1,7 +1,7 @@
-import {useState, useCallback} from 'react';
-import {useNavigation} from '@react-navigation/native';
-import {useAuthRTK} from '@hooks/useAuthRTK';
-import type {NavigationProp} from '../../navigation/types';
+import { useAuthRTK } from '@hooks/useAuthRTK';
+import { useNavigation } from '@react-navigation/native';
+import { useState } from 'react';
+import type { NavigationProp } from '../../navigation/types';
 
 interface UseLoginReturn {
   username: string;
@@ -24,7 +24,7 @@ export const useLogin = (): UseLoginReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = useCallback(async () => {
+  const handleLogin = async () => {
     if (!username.trim() || !password.trim()) {
       setError('Please enter both username and password');
       return;
@@ -41,7 +41,7 @@ export const useLogin = (): UseLoginReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [username, password, login, navigation]);
+  }
 
   return {
     username,

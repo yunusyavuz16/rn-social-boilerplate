@@ -56,7 +56,7 @@ export const useNetwork = () => {
         unsubscribe();
       }
     };
-  }, [dispatch]);
+  }, []);
 
   return {
     /**

@@ -44,7 +44,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
     animation.start();
 
     return () => animation.stop();
-  }, [shimmerAnimation]);
+  }, []);
 
   const translateX = shimmerAnimation.interpolate({
     inputRange: [0, 1],

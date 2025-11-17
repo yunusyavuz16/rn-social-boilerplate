@@ -1,5 +1,5 @@
-import {useState, useCallback, useEffect, useRef} from 'react';
-import type {VideoRef} from 'react-native-video';
+import { useEffect, useRef, useState } from 'react';
+import type { VideoRef } from 'react-native-video';
 
 interface UseVideoPlayerReturn {
   isPlaying: boolean;
@@ -31,17 +31,17 @@ export const useVideoPlayer = (
   const [isLoading] = useState(true);
   const videoRef = useRef<VideoRef | null>(null);
 
-  const play = useCallback(() => {
+  const play = () => {
     setIsPlaying(true);
-  }, []);
+  }
 
-  const pause = useCallback(() => {
+  const pause = () => {
     setIsPlaying(false);
-  }, []);
+  }
 
-  const toggle = useCallback(() => {
+  const toggle = () => {
     setIsPlaying(prev => !prev);
-  }, []);
+  }
 
   // Auto pause/play based on visibility
   useEffect(() => {

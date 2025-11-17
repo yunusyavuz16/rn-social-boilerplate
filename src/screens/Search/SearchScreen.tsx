@@ -1,17 +1,17 @@
-import React, {useState, useCallback, useMemo, useRef} from 'react';
-import {TextInput} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useFocusEffect} from '@react-navigation/native';
-import {useTheme} from '@hooks/useTheme';
-import {ThemedView} from '@components/ThemedView/ThemedView';
-import {SearchBar} from '@components/SearchBar/SearchBar';
-import {MediaGrid} from '@components/MediaGrid/MediaGrid';
-import {EmptyState} from '@components/EmptyState/EmptyState';
-import {BackButton} from '@components/BackButton/BackButton';
-import {useSearchRTK} from '@hooks/useSearchRTK';
-import {useBreakpoint} from '@hooks/useBreakpoint';
-import {GridSkeleton} from '@components/Skeleton/Skeleton';
-import {createStyles} from './SearchScreen.styles';
+import { BackButton } from '@components/BackButton/BackButton';
+import { EmptyState } from '@components/EmptyState/EmptyState';
+import { MediaGrid } from '@components/MediaGrid/MediaGrid';
+import { SearchBar } from '@components/SearchBar/SearchBar';
+import { GridSkeleton } from '@components/Skeleton/Skeleton';
+import { ThemedView } from '@components/ThemedView/ThemedView';
+import { useBreakpoint } from '@hooks/useBreakpoint';
+import { useSearchRTK } from '@hooks/useSearchRTK';
+import { useTheme } from '@hooks/useTheme';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { createStyles } from './SearchScreen.styles';
 
 /**
  * Search screen displaying media in a grid layout
@@ -38,8 +38,7 @@ export const SearchScreen: React.FC = () => {
     return 3;
   }, [breakpoint]);
 
-  const handleSearchChange = useCallback(
-    (text: string) => {
+  const handleSearchChange = (text: string) => {
       setSearchQuery(text);
       const trimmed = text.trim();
 
@@ -48,9 +47,7 @@ export const SearchScreen: React.FC = () => {
       } else {
         clearSearch();
       }
-    },
-    [search, clearSearch],
-  );
+  }
 
   // Auto-focus search input when screen is focused
   useFocusEffect(

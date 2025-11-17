@@ -1,10 +1,10 @@
+import { CustomVideo } from '@components/CustomVideo';
+import { useTheme } from '@hooks/useTheme';
 import React from 'react';
-import {View} from 'react-native';
+import { View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {CustomVideo} from '@components/CustomVideo';
-import type {MediaItem} from '../../types/post.types';
-import {createStyles} from './PostVideo.styles';
-import {useTheme} from '@hooks/useTheme';
+import type { MediaItem } from '../../types/post.types';
+import { createStyles } from './PostVideo.styles';
 
 interface PostVideoProps {
   video: MediaItem;
@@ -21,7 +21,7 @@ interface PostVideoProps {
  * Includes thumbnail fallback when paused
  * Optimized for 4:5 aspect ratio and visibility-based autoplay/pause
  */
-export const PostVideo = React.memo<PostVideoProps>(
+export const PostVideo: React.FC<PostVideoProps> =
   ({video, paused = false, isVisible = true, showPlayButton, showTimer, enableTapToPlay}) => {
     const {theme} = useTheme();
     const styles = createStyles(theme);
@@ -78,21 +78,19 @@ export const PostVideo = React.memo<PostVideoProps>(
             pointerEvents="none"
           />
         )}
-        {/* Always render video component for smooth transitions */}
-        {/* CustomVideo handles paused state internally for memory optimization */}
         <CustomVideo
           source={getVideoSource(video.uri)}
           paused={shouldPause}
-          style={styles.video}
           duration={video.duration}
           showTimer={shouldShowTimer}
           enableTapToPlay={shouldEnableTapToPlay}
           showPlayButton={shouldShowPlayButton}
           muted={false}
           repeat={true}
+          style={styles.video}
         />
       </View>
     );
-});
+};
 
 PostVideo.displayName = 'PostVideo';

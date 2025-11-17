@@ -1,5 +1,5 @@
-import {useState, useCallback} from 'react';
-import type {MediaItem} from '../types/post.types';
+import { useState } from 'react';
+import type { MediaItem } from '../types/post.types';
 
 interface UseMediaCarouselReturn {
   currentIndex: number;
@@ -22,26 +22,23 @@ export const useMediaCarousel = (
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const mediaLength = media.length;
 
-  const goToIndex = useCallback(
-    (index: number) => {
-      if (index >= 0 && index < mediaLength) {
-        setCurrentIndex(index);
-      }
-    },
-    [mediaLength],
-  );
+  const goToIndex = (index: number) => {
+    if (index >= 0 && index < mediaLength) {
+      setCurrentIndex(index);
+    }
+  };
 
-  const goToNext = useCallback(() => {
+  const goToNext = () => {
     if (currentIndex < mediaLength - 1) {
       setCurrentIndex(currentIndex + 1);
     }
-  }, [currentIndex, mediaLength]);
+  };
 
-  const goToPrevious = useCallback(() => {
+  const goToPrevious = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
     }
-  }, [currentIndex]);
+  };
 
   const canGoNext = currentIndex < mediaLength - 1;
   const canGoPrevious = currentIndex > 0;
@@ -56,4 +53,3 @@ export const useMediaCarousel = (
     canGoPrevious,
   };
 };
-

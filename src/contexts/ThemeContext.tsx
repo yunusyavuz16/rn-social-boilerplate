@@ -1,8 +1,8 @@
-import React, {createContext, useState, useEffect, useCallback, ReactNode} from 'react';
-import {Appearance} from 'react-native';
+import { STORAGE_KEYS } from '@constants/storage.constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {createTheme, type ThemeMode, type Theme} from '@styles/theme';
-import {STORAGE_KEYS} from '@constants/storage.constants';
+import { createTheme, type Theme, type ThemeMode } from '@styles/theme';
+import React, { createContext, ReactNode, useEffect, useState } from 'react';
+import { Appearance } from 'react-native';
 
 /**
  * Theme context interface
@@ -31,14 +31,14 @@ interface ThemeProviderProps {
  * Manages theme state and persistence
  * Loads theme from storage on mount, falls back to system theme if no stored preference
  */
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({children}) => {
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [mode, setMode] = useState<ThemeMode>('light');
   const [isInitialized, setIsInitialized] = useState(false);
 
   /**
    * Load theme from storage
    */
-  const loadTheme = useCallback(async () => {
+  const loadTheme = async () => {
     try {
       const storedTheme = await AsyncStorage.getItem(STORAGE_KEYS.THEME_MODE);
 
@@ -65,12 +65,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({children}) => {
       setMode(systemTheme);
       setIsInitialized(true);
     }
-  }, []);
+  };
 
   /**
    * Set theme and persist to storage
    */
-  const setTheme = useCallback(async (newMode: ThemeMode) => {
+  const setTheme = async (newMode: ThemeMode) => {
     try {
       setMode(newMode);
       await AsyncStorage.setItem(STORAGE_KEYS.THEME_MODE, newMode);
@@ -78,14 +78,14 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({children}) => {
       console.error('Error saving theme:', error);
       // Still update the state even if storage fails
     }
-  }, []);
+  };
 
   /**
    * Load theme on mount
    */
   useEffect(() => {
     loadTheme();
-  }, [loadTheme]);
+  }, []);
 
   const theme = createTheme(mode);
 
@@ -98,4 +98,3 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({children}) => {
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };
-

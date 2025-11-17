@@ -1,12 +1,12 @@
-import React, {useMemo} from 'react';
-import {View} from 'react-native';
+import { getCacheMode } from '@components/ImageWithThumbnail/utils/imageUtils';
+import { PostVideo } from '@components/PostVideo/PostVideo';
+import { useTheme } from '@hooks/useTheme';
+import { CachePriority, imageCacheService } from '@services/imageCacheService';
+import React from 'react';
+import { View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {PostVideo} from '@components/PostVideo/PostVideo';
-import {createStyles} from './MediaGridItem.styles';
-import {useTheme} from '@hooks/useTheme';
-import type {MediaGridItemProps} from './MediaGridItemProps';
-import {imageCacheService, CachePriority} from '@services/imageCacheService';
-import {getCacheMode} from '@components/ImageWithThumbnail/utils/imageUtils';
+import { createStyles } from './MediaGridItem.styles';
+import type { MediaGridItemProps } from './MediaGridItemProps';
 
 /**
  * Individual media grid item component
@@ -15,21 +15,21 @@ import {getCacheMode} from '@components/ImageWithThumbnail/utils/imageUtils';
  * Items are not pressable (no navigation to detail screen)
  */
 
-export const MediaGridItem = React.memo<MediaGridItemProps>(({item, isVisible}) => {
+export const MediaGridItem: React.FC<MediaGridItemProps> = ({item, isVisible}) => {
   const {theme} = useTheme();
   const styles = createStyles(theme);
 
   // Grid için sadece thumbnail göster: daha düşük çözünürlük, daha az decode maliyeti
   const thumbnailUri = item.thumbnail ?? item.uri;
 
-  const thumbnailSource = useMemo(() => {
+  const thumbnailSource = (() => {
     const cacheMode = getCacheMode(thumbnailUri);
     return imageCacheService.getCacheSource(
       thumbnailUri,
       cacheMode,
       CachePriority.HIGH,
     );
-  }, [thumbnailUri]);
+  })();
 
   return (
     <View style={styles.container} pointerEvents="none">
@@ -51,7 +51,7 @@ export const MediaGridItem = React.memo<MediaGridItemProps>(({item, isVisible}) 
       )}
     </View>
   );
-});
+};
 
 MediaGridItem.displayName = 'MediaGridItem';
 

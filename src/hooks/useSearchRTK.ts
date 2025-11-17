@@ -1,6 +1,6 @@
-import {useState, useCallback, useEffect, useMemo} from 'react';
-import {useLazySearchPostsQuery, useGetPostsQuery} from '@store/api/postsApi';
-import type {MediaItem, Post} from '../types/post.types';
+import { useGetPostsQuery, useLazySearchPostsQuery } from '@store/api/postsApi';
+import { useEffect, useMemo, useState } from 'react';
+import type { MediaItem, Post } from '../types/post.types';
 
 interface UseSearchRTKReturn {
   media: MediaItem[];
@@ -48,7 +48,7 @@ export const useSearchRTK = (): UseSearchRTKReturn => {
     if (debouncedQuery.trim()) {
       triggerSearch({query: debouncedQuery.trim()});
     }
-  }, [debouncedQuery, triggerSearch]);
+  }, [debouncedQuery]);
 
   // Update posts when search results change
   useEffect(() => {
@@ -87,16 +87,16 @@ export const useSearchRTK = (): UseSearchRTKReturn => {
     return {media: mediaItems, mediaToPostMap: map};
   }, [posts]);
 
-  const search = useCallback((query: string) => {
+  const search =(query: string) => {
     setSearchQuery(query);
-  }, []);
+  }
 
-  const clearSearch = useCallback(() => {
+  const clearSearch = () => {
     setSearchQuery('');
     setDebouncedQuery('');
     // Posts will be set by the initial content effect
     setHasInitialContent(false);
-  }, []);
+  };
 
   return {
     media,

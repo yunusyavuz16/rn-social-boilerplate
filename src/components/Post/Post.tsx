@@ -1,26 +1,27 @@
-import React, {useCallback} from 'react';
-import {TouchableOpacity} from 'react-native';
-import {useTheme} from '@hooks/useTheme';
-import {ThemedView} from '@components/ThemedView/ThemedView';
-import {ThemedText} from '@components/ThemedText/ThemedText';
-import {PostImageCarousel} from '@components/PostImageCarousel/PostImageCarousel';
-import {PostVideo} from '@components/PostVideo/PostVideo';
-import {Avatar} from '@components/Avatar/Avatar';
-import {Icon} from '@components/Icon/Icon';
-import {ICONS} from '@constants/icons.constants';
-import {createStyles} from './Post.styles';
-import type {PostProps} from './PostProps';
+import { Avatar } from '@components/Avatar/Avatar';
+import { Icon } from '@components/Icon/Icon';
+import { PostImageCarousel } from '@components/PostImageCarousel/PostImageCarousel';
+import { PostVideo } from '@components/PostVideo/PostVideo';
+import { ThemedText } from '@components/ThemedText/ThemedText';
+import { ThemedView } from '@components/ThemedView/ThemedView';
+import { ICONS } from '@constants/icons.constants';
+import { useTheme } from '@hooks/useTheme';
+import React from 'react';
+import { TouchableOpacity } from 'react-native';
+import { createStyles } from './Post.styles';
+import type { PostProps } from './PostProps';
 
 /**
  * Post component displaying user post with media
  * with memory optimization to pause videos when not visible
  */
-export const Post = React.memo<PostProps>(({post, onLike, isVisible = true}) => {
-  const {theme} = useTheme();
+export const Post: React.FC<PostProps> = ({ post, onLike, isVisible = true }) => {
+  const { theme } = useTheme();
   const styles = createStyles(theme);
-  const handleLike = useCallback(() => {
+
+  const handleLike = () => {
     onLike(post.id);
-  }, [post.id, onLike]);
+  };
 
   // Determine media rendering:
   // - Carousel for exactly 2 images (swipeable)
@@ -68,23 +69,13 @@ export const Post = React.memo<PostProps>(({post, onLike, isVisible = true}) => 
           style={styles.actionButton}
           accessibilityLabel="Comment on post"
           accessibilityRole="button">
-          <Icon
-            name={ICONS.CHATBUBBLE}
-            size={24}
-            color={theme.colors.text}
-            family="Ionicons"
-          />
+          <Icon name={ICONS.CHATBUBBLE} size={24} color={theme.colors.text} family="Ionicons" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.actionButton}
           accessibilityLabel="Share post"
           accessibilityRole="button">
-          <Icon
-            name={ICONS.SHARE}
-            size={24}
-            color={theme.colors.text}
-            family="Ionicons"
-          />
+          <Icon name={ICONS.SHARE} size={24} color={theme.colors.text} family="Ionicons" />
         </TouchableOpacity>
       </ThemedView>
 
@@ -100,7 +91,6 @@ export const Post = React.memo<PostProps>(({post, onLike, isVisible = true}) => 
       <ThemedText style={styles.comments}>View all {post.comments} comments</ThemedText>
     </ThemedView>
   );
-});
+};
 
 Post.displayName = 'Post';
-

@@ -1,6 +1,6 @@
-import {useState, useCallback, useEffect} from 'react';
-import {useGetPostsQuery, useToggleLikeMutation} from '@store/api/postsApi';
-import type {Post} from '../types/post.types';
+import { useGetPostsQuery, useToggleLikeMutation } from '@store/api/postsApi';
+import { useEffect, useState } from 'react';
+import type { Post } from '../types/post.types';
 
 interface UseFeedRTKReturn {
   posts: Post[];
@@ -27,7 +27,7 @@ export const useFeedRTK = (): UseFeedRTKReturn => {
     isFetching,
     error: queryError,
     refetch,
-  } = useGetPostsQuery({page, limit: 10}, {skip: false});
+  } = useGetPostsQuery({ page, limit: 10 }, { skip: false });
 
   const [toggleLikeMutation] = useToggleLikeMutation();
 
@@ -41,60 +41,55 @@ export const useFeedRTK = (): UseFeedRTKReturn => {
         // Append new posts, filtering out duplicates by ID
         setAllPosts(prev => {
           const existingIds = new Set(prev.map(post => post.id));
-          const newPosts = currentPageData.posts.filter(
-            post => !existingIds.has(post.id),
-          );
+          const newPosts = currentPageData.posts.filter(post => !existingIds.has(post.id));
           return [...prev, ...newPosts];
         });
       }
     }
   }, [currentPageData, page]);
 
-  const refresh = useCallback(() => {
+  const refresh = () => {
     setPage(1);
     setAllPosts([]);
     refetch();
-  }, [refetch]);
+  };
 
-  const loadMore = useCallback(() => {
+  const loadMore = () => {
     if (currentPageData?.hasMore && !isFetching) {
       setPage(prev => prev + 1);
     }
-  }, [currentPageData?.hasMore, isFetching]);
+  };
 
-  const toggleLike = useCallback(
-    (postId: string) => {
-      // Optimistic update
+  const toggleLike = (postId: string) => {
+    // Optimistic update
+    setAllPosts(prevPosts =>
+      prevPosts.map(post =>
+        post.id === postId
+          ? {
+              ...post,
+              isLiked: !post.isLiked,
+              likes: post.isLiked ? post.likes - 1 : post.likes + 1,
+            }
+          : post,
+      ),
+    );
+
+    // Call mutation (for future API integration)
+    toggleLikeMutation({ postId }).catch(() => {
+      // Rollback on error
       setAllPosts(prevPosts =>
         prevPosts.map(post =>
           post.id === postId
             ? {
                 ...post,
                 isLiked: !post.isLiked,
-                likes: post.isLiked ? post.likes - 1 : post.likes + 1,
+                likes: post.isLiked ? post.likes + 1 : post.likes - 1,
               }
             : post,
         ),
       );
-
-      // Call mutation (for future API integration)
-      toggleLikeMutation({postId}).catch(() => {
-        // Rollback on error
-        setAllPosts(prevPosts =>
-          prevPosts.map(post =>
-            post.id === postId
-              ? {
-                  ...post,
-                  isLiked: !post.isLiked,
-                  likes: post.isLiked ? post.likes + 1 : post.likes - 1,
-                }
-              : post,
-          ),
-        );
-      });
-    },
-    [toggleLikeMutation],
-  );
+    });
+  };
 
   // isLoading should be true during initial fetch OR when we're on page 1 and haven't received data yet
   // Keep loading true until we either have posts OR we've confirmed there are no posts
@@ -142,8 +137,8 @@ export const useFeedRTK = (): UseFeedRTKReturn => {
           typeof queryError === 'string'
             ? queryError
             : 'error' in queryError
-              ? String(queryError.error)
-              : 'Failed to fetch posts',
+            ? String(queryError.error)
+            : 'Failed to fetch posts',
         )
       : null,
     hasMore: currentPageData?.hasMore ?? false,
@@ -152,4 +147,3 @@ export const useFeedRTK = (): UseFeedRTKReturn => {
     toggleLike,
   };
 };
-
