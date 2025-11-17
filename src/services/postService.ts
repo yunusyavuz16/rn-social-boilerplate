@@ -1,5 +1,5 @@
-import {API_CONFIG} from '@constants/api.constants';
-import type {Post, PostType, MediaItem} from '../types/post.types';
+import { API_CONFIG } from '@constants/api.constants';
+import type { MediaItem, Post, PostType } from '../types/post.types';
 
 /**
  * Video asset with duration information
@@ -7,6 +7,7 @@ import type {Post, PostType, MediaItem} from '../types/post.types';
 interface VideoAsset {
   uri: string | number;
   duration: number;
+  thumbnail: string | number;
 }
 
 /**
@@ -48,16 +49,16 @@ class PostService {
     ];
 
     const thumbnails = [
-      require('../assets/thumbnails/image-1.png'),
-      require('../assets/thumbnails/image-2.png'),
-      require('../assets/thumbnails/image-3.png'),
-      require('../assets/thumbnails/image-4.png'),
-      require('../assets/thumbnails/image-5.png'),
-      require('../assets/thumbnails/image-6.png'),
-      require('../assets/thumbnails/image-7.png'),
-      require('../assets/thumbnails/image-8.png'),
-      require('../assets/thumbnails/image-9.png'),
-      require('../assets/thumbnails/image-10.png'),
+      require('../assets/thumbnail-images/image-1.png'),
+      require('../assets/thumbnail-images/image-2.png'),
+      require('../assets/thumbnail-images/image-3.png'),
+      require('../assets/thumbnail-images/image-4.png'),
+      require('../assets/thumbnail-images/image-5.png'),
+      require('../assets/thumbnail-images/image-6.png'),
+      require('../assets/thumbnail-images/image-7.png'),
+      require('../assets/thumbnail-images/image-8.png'),
+      require('../assets/thumbnail-images/image-9.png'),
+      require('../assets/thumbnail-images/image-10.png'),
     ];
 
     return images.map((uri, index) => ({
@@ -84,9 +85,23 @@ class PostService {
       require('../assets/videos/video-10.mp4'),
     ];
 
+    const thumbnails = [
+      require('../assets/thumbnail-videos/video-1.png'),
+      require('../assets/thumbnail-videos/video-2.png'),
+      require('../assets/thumbnail-videos/video-3.png'),
+      require('../assets/thumbnail-videos/video-4.png'),
+      require('../assets/thumbnail-videos/video-5.png'),
+      require('../assets/thumbnail-videos/video-6.png'),
+      require('../assets/thumbnail-videos/video-7.png'),
+      require('../assets/thumbnail-videos/video-8.png'),
+      require('../assets/thumbnail-videos/video-9.png'),
+      require('../assets/thumbnail-videos/video-10.png'),
+    ];
+
     return videoUris.map((uri, index) => ({
       uri,
       duration: VIDEO_DURATIONS[index],
+      thumbnail: thumbnails[index],
     }));
   }
 
@@ -101,7 +116,16 @@ class PostService {
 
   private generateMockPosts(page: number = 1, limit: number = 10): Post[] {
     const posts: Post[] = [];
-    const usernames = ['johndoe', 'janedoe', 'photographer', 'traveler', 'artist', 'explorer', 'creator', 'wanderer'];
+    const usernames = [
+      'johndoe',
+      'janedoe',
+      'photographer',
+      'traveler',
+      'artist',
+      'explorer',
+      'creator',
+      'wanderer',
+    ];
     const captions = [
       'Beautiful sunset today! 🌅',
       'Exploring new places',
@@ -141,6 +165,7 @@ class PostService {
           type: 'video',
           uri: videoAsset.uri,
           duration: videoAsset.duration,
+          thumbnail: videoAsset.thumbnail,
         };
         media = [videoItem];
         postTypeName = 'video';
@@ -186,13 +211,16 @@ class PostService {
   /**
    * Fetch posts with pagination
    */
-  async getPosts(page: number = 1, limit: number = 10): Promise<{
+  async getPosts(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{
     posts: Post[];
     hasMore: boolean;
     total: number;
     currentPage: number;
   }> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       setTimeout(() => {
         const posts = this.generateMockPosts(page, limit);
         const totalPages = 10; // Simulate 10 pages of content
@@ -212,7 +240,7 @@ class PostService {
    * Search posts by caption
    */
   async searchPosts(query: string): Promise<Post[]> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       setTimeout(() => {
         // Generate a larger set of posts for search
         const allPosts: Post[] = [];
@@ -223,9 +251,10 @@ class PostService {
 
         // Filter posts by caption (case-insensitive)
         const lowerQuery = query.toLowerCase().trim();
-        const matchingPosts = allPosts.filter(post =>
-          post.caption.toLowerCase().includes(lowerQuery) ||
-          post.username.toLowerCase().includes(lowerQuery)
+        const matchingPosts = allPosts.filter(
+          post =>
+            post.caption.toLowerCase().includes(lowerQuery) ||
+            post.username.toLowerCase().includes(lowerQuery),
         );
 
         resolve(matchingPosts);
@@ -235,4 +264,3 @@ class PostService {
 }
 
 export const postService = new PostService();
-

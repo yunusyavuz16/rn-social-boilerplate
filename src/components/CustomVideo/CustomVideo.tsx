@@ -1,13 +1,7 @@
 import { Icon } from '@components/Icon/Icon';
 import { ICONS } from '@constants/icons.constants';
 import { useTheme } from '@hooks/useTheme';
-import React, {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState
-} from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Video, { type OnLoadData, type OnProgressData, type VideoRef } from 'react-native-video';
 import { createStyles } from './CustomVideo.styles';
@@ -51,15 +45,18 @@ export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
     // This allows user to manually pause/play while respecting visibility-based autoplay
     // Initialize based on paused prop - if paused=false, video should autoplay
     const [internalPaused, setInternalPaused] = useState(() => {
-      // On initial mount, if enableTapToPlay is true and paused is false, start playing
-      // Otherwise, respect the paused prop
       return paused;
     });
-    const previousPausedPropRef = useRef<boolean>(paused);
-    const userPausedRef = useRef<boolean>(false); // Track if user manually paused
 
-    // Reset error state when video becomes visible and should play
-    // This allows video to retry loading when it becomes visible
+    const previousPausedPropRef = useRef<boolean>(paused);
+    const userPausedRef = useRef<boolean>(false);
+
+    const actualPaused = enableTapToPlay ? internalPaused : paused;
+
+    // Use a retry counter to force remount when retrying after error
+    const retryKeyRef = useRef(0);
+    const previousHasErrorRef = useRef(hasError);
+
     useEffect(() => {
       if (!paused && hasError) {
         // Video should play but has error - reset error to allow retry
@@ -104,7 +101,6 @@ export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
     }, [paused, enableTapToPlay, hasError]);
 
     // Determine the actual paused state
-    const actualPaused = enableTapToPlay ? internalPaused : paused;
 
     // Handle tap to toggle play/pause
     const handleTap = () => {
@@ -131,9 +127,6 @@ export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
     // Expose video ref to parent components
     useImperativeHandle(ref, () => videoRef.current as VideoRef, []);
 
-    /**
-     * Format seconds to MM:SS format
-     */
     const formatTime = (seconds: number): string => {
       const mins = Math.floor(seconds / 60);
       const secs = Math.floor(seconds % 60);
@@ -225,18 +218,6 @@ export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
     }, [showTimer, duration, actualPaused, remainingTime, hasError, currentTime]);
 
     /**
-     * Reset timer when video ends (resets for repeat or when video loops)
-     */
-    const handleEnd = () => {
-      // Reset timer and current time when video ends
-      if (duration && duration > 0) {
-        setCurrentTime(0);
-        setRemainingTime(Math.floor(duration));
-      }
-      onEnd?.();
-    };
-
-    /**
      * Reset timer when video loops/repeats
      * When currentTime resets to near 0 after being near the end, video looped
      */
@@ -254,15 +235,13 @@ export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
       }
     }, [currentTime, remainingTime, repeat, duration]);
 
-    // Aggressive buffer configuration to prevent OOM crashes
-    const bufferConfig = aggressiveMemoryMode
-      ? {
-          minBufferMs: 1000,
-          maxBufferMs: 2000,
-          bufferForPlaybackMs: 500,
-          bufferForPlaybackAfterRebufferMs: 1000,
-        }
-      : undefined;
+    useEffect(() => {
+      // Increment retry key when error is cleared (allows retry)
+      if (previousHasErrorRef.current && !hasError) {
+        retryKeyRef.current += 1;
+      }
+      previousHasErrorRef.current = hasError;
+    }, [hasError]);
 
     const handleLoad = (data: OnLoadData) => {
       // Clear error when video loads successfully
@@ -279,6 +258,18 @@ export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
       // to set the correct currentTime when video starts/resumes playing
       // The timer will update automatically when onProgress fires
       onLoad?.(data);
+    };
+
+    /**
+     * Reset timer when video ends (resets for repeat or when video loops)
+     */
+    const handleEnd = () => {
+      // Reset timer and current time when video ends
+      if (duration && duration > 0) {
+        setCurrentTime(0);
+        setRemainingTime(Math.floor(duration));
+      }
+      onEnd?.();
     };
 
     const handleError = (error: any) => {
@@ -306,17 +297,6 @@ export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
       onProgress?.(data);
     };
 
-    // Use a retry counter to force remount when retrying after error
-    const retryKeyRef = useRef(0);
-    const previousHasErrorRef = useRef(hasError);
-    useEffect(() => {
-      // Increment retry key when error is cleared (allows retry)
-      if (previousHasErrorRef.current && !hasError) {
-        retryKeyRef.current += 1;
-      }
-      previousHasErrorRef.current = hasError;
-    }, [hasError]);
-
     // Validate source
     const isValidSource =
       source &&
@@ -326,10 +306,6 @@ export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
     if (!isValidSource) {
       return <View style={[styles.fallback, style]} />;
     }
-
-    // If there's an error, still render the video component but show play button
-    // This allows the video to retry when user taps play or when it becomes visible
-    // The video component will handle the error and we can retry by resetting hasError
 
     const shouldShowTimer =
       showTimer &&
@@ -348,51 +324,15 @@ export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
       (enableTapToPlay && actualPaused) ||
       (!enableTapToPlay && showPlayButton && actualPaused);
 
-    const videoElement = (
-      <Video
-        key={`video-${retryKeyRef.current}`} // Force remount on retry
-        ref={videoRef}
-        source={source as any}
-        paused={actualPaused}
-        repeat={repeat}
-        muted={muted}
-        resizeMode={resizeMode}
-        onLoad={handleLoad}
-        onError={handleError}
-        onProgress={handleProgress}
-        onEnd={handleEnd}
-        controls={false}
-        // Aggressive memory management settings
-        {...(aggressiveMemoryMode && {
-          bufferConfig,
-          maxBitRate: 2000000, // 2 Mbps max
-          disableFocus: true,
-          hideShutterView: true,
-          playInBackground: false,
-          playWhenInactive: false,
-        })}
-        // Additional settings for cleaner playback
-        ignoreSilentSwitch="ignore"
-        fullscreen={false}
-        fullscreenAutorotate={false}
-        controlsStyles={{
-          hidePosition: true,
-          hidePlayPause: true,
-          hideForward: true,
-          hideRewind: true,
-          hideNext: true,
-          hidePrevious: true,
-          hideFullscreen: true,
-          hideSeekBar: true,
-          hideDuration: true,
-          hideNavigationBarOnFullScreenMode: true,
-          hideNotificationBarOnFullScreenMode: true,
-          hideSettingButton: true,
-        }}
-        style={StyleSheet.absoluteFill}
-        pointerEvents="none"
-      />
-    );
+    // Aggressive buffer configuration to prevent OOM crashes
+    const bufferConfig = aggressiveMemoryMode
+      ? {
+          minBufferMs: 1000,
+          maxBufferMs: 2000,
+          bufferForPlaybackMs: 500,
+          bufferForPlaybackAfterRebufferMs: 1000,
+        }
+      : undefined;
 
     // When enableTapToPlay is false, set pointerEvents="none" on container
     // so touches pass through to parent (e.g., TouchableOpacity in MediaGridItem)
@@ -400,7 +340,49 @@ export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
 
     return (
       <View style={[styles.container, style]} pointerEvents={containerPointerEvents}>
-        {videoElement}
+        <Video
+          key={`video-${retryKeyRef.current}`} // Force remount on retry
+          ref={videoRef}
+          source={source as any}
+          paused={actualPaused}
+          repeat={repeat}
+          muted={muted}
+          resizeMode={resizeMode}
+          onLoad={handleLoad}
+          onError={handleError}
+          onProgress={handleProgress}
+          onEnd={handleEnd}
+          controls={false}
+          // Aggressive memory management settings
+          {...(aggressiveMemoryMode && {
+            bufferConfig,
+            maxBitRate: 2000000, // 2 Mbps max
+            disableFocus: true,
+            hideShutterView: true,
+            playInBackground: false,
+            playWhenInactive: false,
+          })}
+          // Additional settings for cleaner playback
+          ignoreSilentSwitch="ignore"
+          fullscreen={false}
+          fullscreenAutorotate={false}
+          controlsStyles={{
+            hidePosition: true,
+            hidePlayPause: true,
+            hideForward: true,
+            hideRewind: true,
+            hideNext: true,
+            hidePrevious: true,
+            hideFullscreen: true,
+            hideSeekBar: true,
+            hideDuration: true,
+            hideNavigationBarOnFullScreenMode: true,
+            hideNotificationBarOnFullScreenMode: true,
+            hideSettingButton: true,
+          }}
+          style={StyleSheet.absoluteFill}
+          pointerEvents="none"
+        />
         {shouldShowTimer && (
           <View style={styles.timerContainer} pointerEvents="none">
             <Text style={styles.timerText}>{formatTime(remainingTime)}</Text>
