@@ -2,14 +2,17 @@ import { Icon } from '@/components/Atoms/Icon/Icon';
 import { ICONS } from '@constants/icons.constants';
 import { useTheme } from '@hooks/useTheme';
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Video, { type OnLoadData, type OnProgressData, type VideoRef } from 'react-native-video';
+import {
+  CustomVideoTimer,
+  type CustomVideoTimerRef,
+} from './components/CustomVideoTimer/CustomVideoTimer';
 import { PLAY_HIT_SLOP, VIDEO_CONTROLS_STYLES } from './constants';
 import { createStyles } from './CustomVideo.styles';
 import type { CustomVideoProps } from './CustomVideoProps';
 import { useVideoControls } from './hooks/useVideoControls';
 import { useVideoError } from './hooks/useVideoError';
-import { useVideoTimer } from './hooks/useVideoTimer';
 
 export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
   (
@@ -35,6 +38,7 @@ export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
     const { theme } = useTheme();
     const styles = createStyles(theme);
     const videoRef = useRef<VideoRef | null>(null);
+    const timerRef = useRef<CustomVideoTimerRef | null>(null);
 
     useImperativeHandle(ref, () => videoRef.current as VideoRef, []);
 
@@ -53,12 +57,6 @@ export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
       showPlayButton,
       hasError,
       onErrorReset: resetError,
-    });
-
-    const { shouldShowTimer, formattedTime, updateFromProgress, reset } = useVideoTimer({
-      duration,
-      showTimer,
-      hasError,
     });
 
     const isValidSource = Boolean(
@@ -83,17 +81,17 @@ export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
     };
 
     const handleVideoProgress = (data: OnProgressData) => {
-      updateFromProgress(data.currentTime);
+      timerRef.current?.updateFromProgress(data.currentTime);
       onProgress?.(data);
     };
 
     const handleVideoEnd = () => {
-      reset();
+      timerRef.current?.reset();
       onEnd?.();
     };
 
     const handleVideoError = (error: unknown) => {
-      reset();
+      timerRef.current?.reset();
       handleError(error);
       onPlaybackError?.(error);
     };
@@ -140,11 +138,12 @@ export const CustomVideo = forwardRef<VideoRef, CustomVideoProps>(
           style={StyleSheet.absoluteFill}
           pointerEvents="none"
         />
-        {shouldShowTimer && formattedTime && (
-          <View style={styles.timerContainer} pointerEvents="none">
-            <Text style={styles.timerText}>{formattedTime}</Text>
-          </View>
-        )}
+        <CustomVideoTimer
+          ref={timerRef}
+          duration={duration}
+          showTimer={showTimer}
+          hasError={hasError}
+        />
         {showTapOverlay ? (
           <Pressable style={[StyleSheet.absoluteFill, styles.tapOverlay]} onPress={handleTap}>
             {shouldShowPlayButton && (
