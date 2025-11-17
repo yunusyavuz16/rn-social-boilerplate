@@ -2,7 +2,7 @@ import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useAuthRTK} from '@hooks/useAuthRTK';
-import {LoadingScreen} from '@components/LoadingScreen/LoadingScreen';
+import {LoadingScreen} from '@/components/Organisms/LoadingScreen/LoadingScreen';
 import type {RootStackParamList} from './types';
 import {LoginScreen} from '@screens/Login/LoginScreen';
 import {FeedScreen} from '@screens/Feed/FeedScreen';

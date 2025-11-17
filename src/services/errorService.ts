@@ -1,7 +1,3 @@
-/**
- * Error service for error classification and user-friendly messages
- */
-
 export enum ErrorType {
   NETWORK = 'NETWORK',
   TIMEOUT = 'TIMEOUT',

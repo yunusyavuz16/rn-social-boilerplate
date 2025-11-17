@@ -1,8 +1,8 @@
-import { Avatar } from '@components/Avatar/Avatar';
-import { BackButton } from '@components/BackButton/BackButton';
-import { Button } from '@components/Button/Button';
-import { ThemedText } from '@components/ThemedText/ThemedText';
-import { ThemedView } from '@components/ThemedView/ThemedView';
+import { Avatar } from '@/components/Molecules/Avatar/Avatar';
+import { BackButton } from '@/components/Molecules/BackButton/BackButton';
+import { Button } from '@/components/Molecules/Button/Button';
+import { ThemedText } from '@/components/Atoms/ThemedText/ThemedText';
+import { ThemedView } from '@/components/Atoms/ThemedView/ThemedView';
 import { useAuthRTK } from '@hooks/useAuthRTK';
 import { useTheme } from '@hooks/useTheme';
 import { useNavigation } from '@react-navigation/native';

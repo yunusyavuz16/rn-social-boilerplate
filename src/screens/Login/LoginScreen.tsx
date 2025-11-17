@@ -3,11 +3,11 @@ import {KeyboardAvoidingView, Platform} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useTheme} from '@hooks/useTheme';
 import {useBreakpoint} from '@hooks/useBreakpoint';
-import {ThemedView} from '@components/ThemedView/ThemedView';
-import {ThemedText} from '@components/ThemedText/ThemedText';
-import {Input} from '@components/Input/Input';
-import {Button} from '@components/Button/Button';
-import {useLogin} from './useLogin';
+import {ThemedView} from '@/components/Atoms/ThemedView/ThemedView';
+import {ThemedText} from '@/components/Atoms/ThemedText/ThemedText';
+import {Input} from '@/components/Molecules/Input/Input';
+import {Button} from '@/components/Molecules/Button/Button';
+import {useLogin} from './hooks/useLogin';
 import {createStyles} from './LoginScreen.styles';
 
 /**

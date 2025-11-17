@@ -1,10 +1,10 @@
 import { useFeedRTK } from '@/screens/Feed/hooks/useFeedRTK';
-import { EmptyState } from '@components/EmptyState/EmptyState';
-import { FeedHeader } from '@components/FeedHeader/FeedHeader';
-import { Post } from '@components/Post/Post';
-import { PostSkeleton } from '@components/Skeleton/Skeleton';
-import { ThemedText } from '@components/ThemedText/ThemedText';
-import { ThemedView } from '@components/ThemedView/ThemedView';
+import { EmptyState } from '@/components/Molecules/EmptyState/EmptyState';
+import { FeedHeader } from '@/components/Molecules/FeedHeader/FeedHeader';
+import { Post } from '@/components/Organisms/Post/Post';
+import { PostSkeleton } from '@/components/Molecules/Skeleton/Skeleton';
+import { ThemedText } from '@/components/Atoms/ThemedText/ThemedText';
+import { ThemedView } from '@/components/Atoms/ThemedView/ThemedView';
 import { useBreakpoint } from '@hooks/useBreakpoint';
 import { useImagePrefetch } from '@hooks/useImagePrefetch';
 import { useMediaPlayerVisibility } from '@hooks/useMediaPlayerVisibility';

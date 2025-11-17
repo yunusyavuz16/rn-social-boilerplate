@@ -1,7 +1,3 @@
-/**
- * Post and media related type definitions
- */
-
 export type MediaType = 'image' | 'video';
 
 export interface MediaItem {

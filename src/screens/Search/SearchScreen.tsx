@@ -1,9 +1,9 @@
-import { BackButton } from '@components/BackButton/BackButton';
-import { EmptyState } from '@components/EmptyState/EmptyState';
-import { MediaGrid } from '@components/MediaGrid/MediaGrid';
-import { SearchBar } from '@components/SearchBar/SearchBar';
-import { GridSkeleton } from '@components/Skeleton/Skeleton';
-import { ThemedView } from '@components/ThemedView/ThemedView';
+import { BackButton } from '@/components/Molecules/BackButton/BackButton';
+import { EmptyState } from '@/components/Molecules/EmptyState/EmptyState';
+import { MediaGrid } from '@/components/Organisms/MediaGrid/MediaGrid';
+import { SearchBar } from '@/components/Molecules/SearchBar/SearchBar';
+import { GridSkeleton } from '@/components/Molecules/Skeleton/Skeleton';
+import { ThemedView } from '@/components/Atoms/ThemedView/ThemedView';
 import { useBreakpoint } from '@hooks/useBreakpoint';
 import { useSearchRTK } from '@/screens/Search/hooks/useSearchRTK';
 import { useTheme } from '@hooks/useTheme';

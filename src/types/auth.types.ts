@@ -1,7 +1,3 @@
-/**
- * Authentication related type definitions
- */
-
 export interface User {
   id: string;
   username: string;
@@ -19,4 +15,3 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
 }
-

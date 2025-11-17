@@ -1,22 +1,23 @@
+import { ThemedView } from '@/components/Atoms/ThemedView/ThemedView';
+import { OfflineNotification } from '@/components/Molecules/OfflineNotification/OfflineNotification';
+import { ErrorBoundary } from '@/components/Organisms/ErrorBoundary/ErrorBoundary';
+import { ThemeProvider } from '@contexts/ThemeContext';
+import { useTheme } from '@hooks/useTheme';
+import { AppNavigator } from '@navigation/AppNavigator';
+import { store } from '@store/store';
+import { createTheme } from '@styles/theme';
 import React from 'react';
-import {StatusBar} from 'react-native';
-import {Provider} from 'react-redux';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {AppNavigator} from '@navigation/AppNavigator';
-import {ErrorBoundary} from '@components/ErrorBoundary/ErrorBoundary';
-import {ThemeProvider} from '@contexts/ThemeContext';
-import {useTheme} from '@hooks/useTheme';
-import {ThemedView} from '@components/ThemedView/ThemedView';
-import {OfflineNotification} from '@components/OfflineNotification/OfflineNotification';
-import {createTheme} from '@styles/theme';
-import {store} from '@store/store';
+import { StatusBar } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Provider } from 'react-redux';
+import { styles } from './app.styles';
 
 /**
  * App content component that uses theme
  * Separated to access theme context
  */
 const AppContent: React.FC = () => {
-  const {theme, isInitialized} = useTheme();
+  const { theme, isInitialized } = useTheme();
 
   // Use current theme or fallback to light theme during initialization
   const currentTheme = isInitialized ? theme : createTheme('light');
@@ -29,13 +30,9 @@ const AppContent: React.FC = () => {
         backgroundColor={currentTheme.colors.background}
         translucent={false}
       />
-      <ThemedView style={{flex: 1}}>
+      <ThemedView style={styles.container}>
         <OfflineNotification position="top" />
-        {isInitialized ? (
-          <AppNavigator />
-        ) : (
-          <ThemedView style={{flex: 1}} />
-        )}
+        {isInitialized ? <AppNavigator /> : <ThemedView style={styles.container} />}
       </ThemedView>
     </>
   );
@@ -59,4 +56,3 @@ function App(): React.JSX.Element {
 }
 
 export default App;
-

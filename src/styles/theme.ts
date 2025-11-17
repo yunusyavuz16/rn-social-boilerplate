@@ -1,9 +1,4 @@
-/**
- * Theme configuration with colors, spacing, and typography tokens
- * Supports light and dark mode with responsive scaling
- */
-
-import type {Breakpoint} from '@utils/breakpoints';
+import type { Breakpoint } from '@utils/breakpoints';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -149,18 +144,10 @@ export const borderRadius = {
   round: 9999,
 } as const;
 
-/**
- * Get theme colors based on mode
- */
 export const getThemeColors = (mode: ThemeMode) => {
   return mode === 'light' ? lightColors : darkColors;
 };
 
-/**
- * Create theme object for a specific mode
- * Note: Responsive spacing and typography should be accessed via getResponsiveSpacing,
- * getResponsiveFontSize, and getResponsiveLineHeight functions with breakpoint from useBreakpoint hook
- */
 export const createTheme = (mode: ThemeMode) => {
   return {
     mode,
@@ -176,4 +163,3 @@ export const createTheme = (mode: ThemeMode) => {
 };
 
 export type Theme = ReturnType<typeof createTheme>;
-

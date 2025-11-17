@@ -1,10 +1,6 @@
 import {API_CONFIG} from '@constants/api.constants';
 import type {User, LoginCredentials} from '../types/auth.types';
 
-/**
- * Mock authentication service
- * Accepts any input and returns success
- */
 class AuthService {
   /**
    * Mock login - accepts any credentials and returns success
