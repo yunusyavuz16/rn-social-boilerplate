@@ -1,9 +1,5 @@
 import React from 'react';
-import {StyleSheet} from 'react-native';
-import {useTheme} from '@hooks/useTheme';
-import {ThemedView} from '@components/ThemedView/ThemedView';
-import {ThemedText} from '@components/ThemedText/ThemedText';
-import {Button} from '@components/Button/Button';
+import {StyleSheet, View, Text, Pressable} from 'react-native';
 import {createTheme} from '@styles/theme';
 
 interface ErrorFallbackProps {
@@ -14,35 +10,40 @@ interface ErrorFallbackProps {
 /**
  * Error fallback UI component
  * Displays user-friendly error message with retry option
+ * Uses fallback theme to work even when ThemeProvider is not available
  */
 export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   error,
   resetErrorBoundary,
 }) => {
-  const {theme} = useTheme();
+  // Use fallback theme since ErrorBoundary is outside ThemeProvider
+  const theme = createTheme('light');
   const styles = createStyles(theme);
   const isDev = __DEV__;
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>Something went wrong</ThemedText>
-      <ThemedText style={styles.message}>
+    <View style={styles.container}>
+      <Text style={styles.title}>Something went wrong</Text>
+      <Text style={styles.message}>
         We're sorry, but something unexpected happened. Please try again.
-      </ThemedText>
+      </Text>
       {isDev && (
-        <ThemedView style={styles.errorDetails}>
-          <ThemedText style={styles.errorText}>{error.message}</ThemedText>
+        <View style={styles.errorDetails}>
+          <Text style={styles.errorText}>{error.message}</Text>
           {error.stack && (
-            <ThemedText style={styles.stackTrace}>{error.stack}</ThemedText>
+            <Text style={styles.stackTrace}>{error.stack}</Text>
           )}
-        </ThemedView>
+        </View>
       )}
-      <Button
-        title="Try Again"
+      <Pressable
         onPress={resetErrorBoundary}
-        style={styles.button}
-      />
-    </ThemedView>
+        style={({pressed}) => [
+          styles.button,
+          pressed && styles.buttonPressed,
+        ]}>
+        <Text style={styles.buttonText}>Try Again</Text>
+      </Pressable>
+    </View>
   );
 };
 
@@ -88,6 +89,20 @@ const createStyles = (theme: ReturnType<typeof createTheme>) =>
     },
     button: {
       minWidth: 120,
+      paddingHorizontal: theme.spacing.lg,
+      paddingVertical: theme.spacing.md,
+      backgroundColor: theme.colors.primary,
+      borderRadius: theme.borderRadius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    buttonPressed: {
+      opacity: 0.8,
+    },
+    buttonText: {
+      fontSize: theme.typography.fontSize.md,
+      fontWeight: theme.typography.fontWeight.semiBold,
+      color: theme.colors.white,
     },
   });
 

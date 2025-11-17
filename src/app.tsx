@@ -7,6 +7,7 @@ import {ErrorBoundary} from '@components/ErrorBoundary/ErrorBoundary';
 import {ThemeProvider} from '@contexts/ThemeContext';
 import {useTheme} from '@hooks/useTheme';
 import {ThemedView} from '@components/ThemedView/ThemedView';
+import {OfflineNotification} from '@components/OfflineNotification/OfflineNotification';
 import {createTheme} from '@styles/theme';
 import {store} from '@store/store';
 
@@ -28,11 +29,14 @@ const AppContent: React.FC = () => {
         backgroundColor={currentTheme.colors.background}
         translucent={false}
       />
-      {isInitialized ? (
-        <AppNavigator />
-      ) : (
-        <ThemedView style={{flex: 1}} />
-      )}
+      <ThemedView style={{flex: 1}}>
+        <OfflineNotification position="top" />
+        {isInitialized ? (
+          <AppNavigator />
+        ) : (
+          <ThemedView style={{flex: 1}} />
+        )}
+      </ThemedView>
     </>
   );
 };

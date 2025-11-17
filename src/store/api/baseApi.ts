@@ -1,13 +1,26 @@
 import {createApi, BaseQueryFn, FetchBaseQueryError} from '@reduxjs/toolkit/query/react';
 import {createAppError} from '@services/errorService';
+import {networkService} from '@services/networkService';
 import {API_CONFIG} from '@constants/api.constants';
 
 /**
  * Custom base query for mock API
  * Simulates API calls with delay and error handling
+ * Prevents API requests when device is offline
  */
 const mockBaseQuery: BaseQueryFn<any, unknown, FetchBaseQueryError> = async ({body}) => {
   try {
+    // Check network availability before making request
+    const isOnline = networkService.isOnline();
+    if (!isOnline) {
+      return {
+        error: {
+          status: 'CUSTOM_ERROR',
+          error: 'No internet connection. Please check your network settings.',
+        } as FetchBaseQueryError,
+      };
+    }
+
     // Simulate API delay
     await new Promise<void>(resolve => setTimeout(() => resolve(), API_CONFIG.MOCK_DELAY));
 

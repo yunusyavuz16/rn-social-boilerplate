@@ -1,15 +1,17 @@
 import {configureStore} from '@reduxjs/toolkit';
 import {baseApi} from './api/baseApi';
 import {authSlice} from './slices/authSlice';
+import networkReducer from './slices/networkSlice';
 
 /**
  * Redux store configuration
- * Includes RTK Query API and auth slice
+ * Includes RTK Query API, auth slice, and network slice
  */
 export const store = configureStore({
   reducer: {
     [baseApi.reducerPath]: baseApi.reducer,
     auth: authSlice.reducer,
+    network: networkReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
