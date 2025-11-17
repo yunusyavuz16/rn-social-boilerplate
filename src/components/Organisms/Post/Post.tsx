@@ -40,6 +40,16 @@ export const Post: React.FC<PostProps> = React.memo(
     const isSingleVideo = type === 'video' && media.length === 1;
     const shouldPauseVideo = !isVisible;
 
+    const renderMedia = () => {
+      if (isImageCarousel) {
+        return <PostImageCarousel media={media} />;
+      }
+      if (isSingleVideo) {
+        return <PostVideo video={media[0]} paused={shouldPauseVideo} isVisible={isVisible} />;
+      }
+      return null;
+    };
+
     return (
       <ThemedView style={styles.container}>
         {/* Header */}
@@ -52,11 +62,7 @@ export const Post: React.FC<PostProps> = React.memo(
 
         {/* Media */}
         <ThemedView style={styles.mediaContainer}>
-          {isImageCarousel ? (
-            <PostImageCarousel media={media} />
-          ) : isSingleVideo ? (
-            <PostVideo video={media[0]} paused={shouldPauseVideo} isVisible={isVisible} />
-          ) : null}
+          {renderMedia()}
         </ThemedView>
 
         {/* Actions */}

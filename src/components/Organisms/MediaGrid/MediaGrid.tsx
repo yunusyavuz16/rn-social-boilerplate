@@ -4,9 +4,9 @@ import { useMediaPlayerVisibility } from '@hooks/useMediaPlayerVisibility';
 import { useTheme } from '@hooks/useTheme';
 import React, { useEffect, useRef } from 'react';
 import { FlatList, Platform, View } from 'react-native';
-import type { MediaItem } from '../../../../types/post.types';
 import { createStyles } from './MediaGrid.styles';
 import { MediaGridItem } from './components/MediaGridItem';
+import { MediaItem } from '@/types/post.types';
 
 interface MediaGridProps {
   data: MediaItem[];
@@ -41,10 +41,10 @@ export const MediaGrid: React.FC<MediaGridProps> = ({ data, numColumns: propNumC
   // Prefetch visible items with thumbnails
   useEffect(() => {
     if (data.length > 0 && visibleItems.size > 0) {
-      const visibleIndices = Array.from(visibleItems).slice(0, 12);
+      const visibleIndices: number[] = Array.from(visibleItems).slice(0, 12);
       const imageItems = visibleIndices
         .map(index => data[index])
-        .filter(item => item && item.type === 'image')
+        .filter(item => item?.type === 'image')
         .map(item => ({ uri: item.uri, thumbnailUri: item.thumbnail }));
       if (imageItems.length > 0) {
         prefetchImages(imageItems);

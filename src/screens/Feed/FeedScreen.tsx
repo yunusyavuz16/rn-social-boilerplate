@@ -106,10 +106,13 @@ export const FeedScreen: React.FC = () => {
   const renderEmpty = () => {
     // Show loading skeleton during initial load
     if (isLoading) {
+      const skeletonItems = Array.from({ length: 3 }, (_, i) => ({
+        id: `skeleton-${i}`,
+      }));
       return (
         <ThemedView style={styles.emptyContainer}>
-          {Array.from({ length: 3 }).map((_, i) => (
-            <PostSkeleton key={i} />
+          {skeletonItems.map(item => (
+            <PostSkeleton key={item.id} />
           ))}
         </ThemedView>
       );

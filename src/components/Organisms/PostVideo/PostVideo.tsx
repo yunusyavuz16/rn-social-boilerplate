@@ -56,12 +56,11 @@ export const PostVideo: React.FC<PostVideoProps> = ({
 
   const shouldPause = paused || !isVisible;
 
-  const shouldEnableTapToPlay = enableTapToPlay !== undefined ? enableTapToPlay : isVisible;
+  const shouldEnableTapToPlay = enableTapToPlay ?? isVisible;
 
-  const shouldShowPlayButton =
-    showPlayButton !== undefined ? showPlayButton : shouldPause || shouldEnableTapToPlay;
+  const shouldShowPlayButton = showPlayButton ?? (shouldPause || shouldEnableTapToPlay);
 
-  const shouldShowTimer = showTimer !== undefined ? showTimer : isVisible && !shouldPause;
+  const shouldShowTimer = showTimer ?? (isVisible && !shouldPause);
 
   return (
     <View style={styles.container} pointerEvents={shouldEnableTapToPlay ? 'auto' : 'none'}>

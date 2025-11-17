@@ -33,12 +33,14 @@ export const Button: React.FC<ButtonProps> = ({
     textStyle,
   ];
 
-  const indicatorColor =
-    variant === 'primary'
-      ? theme.mode === 'dark'
-        ? theme.colors.black
-        : theme.colors.white
-      : theme.colors.text;
+  const getIndicatorColor = () => {
+    if (variant === 'primary') {
+      return theme.mode === 'dark' ? theme.colors.black : theme.colors.white;
+    }
+    return theme.colors.text;
+  };
+
+  const indicatorColor = getIndicatorColor();
 
   return (
     <Pressable

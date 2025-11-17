@@ -36,7 +36,6 @@ export const useSearchRTK = (): UseSearchRTKReturn => {
     }, 300);
 
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
   // Trigger search when debounced query changes
@@ -74,12 +73,12 @@ export const useSearchRTK = (): UseSearchRTKReturn => {
     const mediaItems: MediaItem[] = [];
     const map = new Map<string, Post>();
 
-    posts.forEach(post => {
-      post.media.forEach(mediaItem => {
+    for (const post of posts) {
+      for (const mediaItem of post.media) {
         mediaItems.push(mediaItem);
         map.set(mediaItem.id, post);
-      });
-    });
+      }
+    }
 
     return {media: mediaItems, mediaToPostMap: map};
   })();
@@ -100,23 +99,27 @@ export const useSearchRTK = (): UseSearchRTKReturn => {
     posts,
     mediaToPostMap,
     isLoading: isLoading || isLoadingInitial,
-    error: queryError
-      ? new Error(
-          typeof queryError === 'string'
-            ? queryError
-            : 'error' in queryError
-              ? String(queryError.error)
-              : 'Search failed',
-        )
-      : initialError
-        ? new Error(
-            typeof initialError === 'string'
-              ? initialError
-              : 'error' in initialError
-                ? String(initialError.error)
-                : 'Failed to load initial content',
-          )
-        : null,
+    error: (() => {
+      if (queryError) {
+        if (typeof queryError === 'string') {
+          return new Error(queryError);
+        }
+        if ('error' in queryError) {
+          return new Error(String(queryError.error));
+        }
+        return new Error('Search failed');
+      }
+      if (initialError) {
+        if (typeof initialError === 'string') {
+          return new Error(initialError);
+        }
+        if ('error' in initialError) {
+          return new Error(String(initialError.error));
+        }
+        return new Error('Failed to load initial content');
+      }
+      return null;
+    })(),
     hasInitialContent,
     search,
     clearSearch,

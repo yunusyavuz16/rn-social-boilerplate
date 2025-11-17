@@ -52,8 +52,8 @@ export const spacing = {
  * Applied to base spacing values for larger screens
  */
 export const spacingScale: Record<Breakpoint, number> = {
-  xs: 1.0, // Base scale for extra small
-  sm: 1.0, // Base scale for small (phone)
+  xs: 1, // Base scale for extra small
+  sm: 1, // Base scale for small (phone)
   md: 1.25, // 25% larger for tablet
   lg: 1.5, // 50% larger for large tablet
   xl: 1.75, // 75% larger for desktop
@@ -105,8 +105,8 @@ export const typography = {
  * Applied to base font sizes for larger screens
  */
 export const typographyScale: Record<Breakpoint, number> = {
-  xs: 1.0, // Base scale for extra small
-  sm: 1.0, // Base scale for small (phone)
+  xs: 1, // Base scale for extra small
+  sm: 1, // Base scale for small (phone)
   md: 1.125, // 12.5% larger for tablet
   lg: 1.25, // 25% larger for large tablet
   xl: 1.375, // 37.5% larger for desktop

@@ -60,6 +60,18 @@ export const useFeedRTK = (): UseFeedRTKReturn => {
     }
   };
 
+  const rollbackLike = (prevPosts: Post[], postId: string) => {
+    return prevPosts.map(post =>
+      post.id === postId
+        ? {
+            ...post,
+            isLiked: !post.isLiked,
+            likes: post.isLiked ? post.likes + 1 : post.likes - 1,
+          }
+        : post,
+    );
+  };
+
   const toggleLike = (postId: string) => {
     // Optimistic update
     setAllPosts(prevPosts =>
@@ -77,17 +89,7 @@ export const useFeedRTK = (): UseFeedRTKReturn => {
     // Call mutation (for future API integration)
     toggleLikeMutation({ postId }).catch(() => {
       // Rollback on error
-      setAllPosts(prevPosts =>
-        prevPosts.map(post =>
-          post.id === postId
-            ? {
-                ...post,
-                isLiked: !post.isLiked,
-                likes: post.isLiked ? post.likes + 1 : post.likes - 1,
-              }
-            : post,
-        ),
-      );
+      setAllPosts(prevPosts => rollbackLike(prevPosts, postId));
     });
   };
 
@@ -112,7 +114,7 @@ export const useFeedRTK = (): UseFeedRTKReturn => {
     // If we've received an empty response (no posts), don't show loading
     if (
       currentPageData !== undefined &&
-      currentPageData.posts.length === 0 &&
+      currentPageData.posts?.length === 0 &&
       !isFetching &&
       !isLoading
     ) {
@@ -132,15 +134,18 @@ export const useFeedRTK = (): UseFeedRTKReturn => {
     posts: allPosts,
     isLoading: isInitialLoading,
     isLoadingMore: isFetching && page > 1,
-    error: queryError
-      ? new Error(
-          typeof queryError === 'string'
-            ? queryError
-            : 'error' in queryError
-            ? String(queryError.error)
-            : 'Failed to fetch posts',
-        )
-      : null,
+    error: (() => {
+      if (!queryError) {
+        return null;
+      }
+      if (typeof queryError === 'string') {
+        return new Error(queryError);
+      }
+      if ('error' in queryError) {
+        return new Error(String(queryError.error));
+      }
+      return new Error('Failed to fetch posts');
+    })(),
     hasMore: currentPageData?.hasMore ?? false,
     refresh,
     loadMore,

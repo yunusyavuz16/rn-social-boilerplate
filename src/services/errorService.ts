@@ -17,7 +17,7 @@ export interface AppError {
 /**
  * Classify error type
  */
-export const classifyError = (error: Error | unknown): ErrorType => {
+export const classifyError = (error: unknown): ErrorType => {
   if (error instanceof Error) {
     const message = error.message.toLowerCase();
     if (message.includes('network') || message.includes('fetch')) {
@@ -73,7 +73,7 @@ export const isRetryable = (errorType: ErrorType): boolean => {
 /**
  * Create AppError from unknown error
  */
-export const createAppError = (error: Error | unknown): AppError => {
+export const createAppError = (error: unknown): AppError => {
   const errorType = classifyError(error);
   const originalError = error instanceof Error ? error : new Error(String(error));
 

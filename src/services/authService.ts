@@ -13,14 +13,22 @@ class AuthService {
    * Mock login - accepts any credentials and returns success + tokens
    */
   async login(credentials: LoginCredentials): Promise<AuthSession> {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
+      try {
       setTimeout(() => {
         const username = credentials.username?.trim() || 'user';
+          if (!username) {
+            reject(new Error('Username is required'));
+            return;
+          }
         resolve({
           user: this.buildUser(username),
           tokens: this.createTokenPair(username),
         });
       }, API_CONFIG.MOCK_DELAY);
+      } catch (error) {
+        reject(error instanceof Error ? error : new Error('Login failed'));
+      }
     });
   }
 
@@ -29,6 +37,12 @@ class AuthService {
    */
   async refreshSession(refreshToken: string): Promise<AuthSession> {
     return new Promise((resolve, reject) => {
+      try {
+        if (!refreshToken || typeof refreshToken !== 'string') {
+          reject(new Error('Refresh token is required'));
+          return;
+        }
+
       setTimeout(() => {
         const username = this.extractUsernameFromToken(refreshToken);
         if (!username) {
@@ -41,6 +55,9 @@ class AuthService {
           tokens: this.createTokenPair(username),
         });
       }, API_CONFIG.MOCK_DELAY);
+      } catch (error) {
+        reject(error instanceof Error ? error : new Error('Token refresh failed'));
+      }
     });
   }
 
@@ -55,33 +72,36 @@ class AuthService {
     });
   }
 
-  private buildUser(username: string): User {
-    const safeUsername = username || 'user';
+  private buildUser(username: string = 'user'): User {
     return {
-      id: `user_${safeUsername}`,
-      username: safeUsername,
-      email: `${safeUsername}@example.com`,
+      id: `user_${username}`,
+      username,
+      email: `${username}@example.com`,
       avatar: undefined,
     };
   }
 
-  private createTokenPair(username: string): AuthTokens {
+  private createTokenPair(username: string = 'user'): AuthTokens {
     const timestamp = Date.now();
-    const safeUsername = username || 'user';
     return {
-      accessToken: `access::${safeUsername}::${timestamp}`,
-      refreshToken: `refresh::${safeUsername}::${timestamp}`,
+      accessToken: `access::${username}::${timestamp}`,
+      refreshToken: `refresh::${username}::${timestamp}`,
       expiresIn: this.tokenExpirySeconds,
     };
   }
 
   private extractUsernameFromToken(token: string): string | null {
-    if (!token?.startsWith('refresh::')) {
+    if (!token || typeof token !== 'string' || !token.startsWith('refresh::')) {
       return null;
     }
 
-    const [, username] = token.split('::');
-    return username || null;
+    const parts = token.split('::');
+    if (parts.length < 2) {
+      return null;
+    }
+
+    const username = parts[1];
+    return username && username.trim().length > 0 ? username.trim() : null;
   }
 }
 

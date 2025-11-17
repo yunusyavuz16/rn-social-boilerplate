@@ -6,7 +6,7 @@ import type {NetworkState} from '../types/network.types';
  * Provides network state information and change listeners
  */
 class NetworkService {
-  private listeners: Set<(state: NetworkState) => void> = new Set();
+  private readonly listeners: Set<(state: NetworkState) => void> = new Set();
   private currentState: NetworkState | null = null;
 
   /**
@@ -31,14 +31,16 @@ class NetworkService {
       callback(this.currentState);
     }
 
-    // Set up NetInfo listener
-    const unsubscribe = NetInfo.addEventListener(state => {
-      this.currentState = this.transformNetInfoState(state);
-      // Only notify listeners if state is not null (should always be the case, but TypeScript safety)
-      if (this.currentState) {
-        this.listeners.forEach(listener => listener(this.currentState!));
-      }
-    });
+      // Set up NetInfo listener
+      const unsubscribe = NetInfo.addEventListener(state => {
+        this.currentState = this.transformNetInfoState(state);
+        // Only notify listeners if state is not null (should always be the case, but TypeScript safety)
+        if (this.currentState) {
+          for (const listener of this.listeners) {
+            listener(this.currentState);
+          }
+        }
+      });
 
     // Return combined unsubscribe function
     return () => {

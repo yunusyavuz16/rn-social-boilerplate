@@ -1,4 +1,4 @@
-import {Extrapolate, interpolate, type SharedValue} from 'react-native-reanimated';
+import {interpolate, type SharedValue} from 'react-native-reanimated';
 
 type DotAnimatedStyleFactoryParams = {
   scrollX: SharedValue<number>;
@@ -28,8 +28,14 @@ export const getDotAnimatedStyleFactory = ({
       (index + 1) * screenWidth,
     ];
 
-    const scale = interpolate(scrollX.value, inputRange, [0.8, 1.2, 0.8], Extrapolate.CLAMP);
-    const opacity = interpolate(scrollX.value, inputRange, [0.5, 1, 0.5], Extrapolate.CLAMP);
+    const scale = interpolate(scrollX.value, inputRange, [0.8, 1.2, 0.8], {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+    });
+    const opacity = interpolate(scrollX.value, inputRange, [0.5, 1, 0.5], {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+    });
 
     return {
       transform: [{scale}],

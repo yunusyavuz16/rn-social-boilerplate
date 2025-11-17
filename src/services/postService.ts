@@ -62,8 +62,6 @@ class PostService {
     for (let i = 0; i < limit; i++) {
       const postIndex = startIndex + i;
       const username = USERNAMES[postIndex % USERNAMES.length];
-      let media: MediaItem[] = [];
-      let postTypeName: PostType = 'images';
 
       // Shuffle arrays for variety
       const shuffledImages = this.shuffleArray(allImages);
@@ -71,6 +69,9 @@ class PostService {
 
       // Alternate between 2 images and 1 video
       const isVideoPost = postIndex % 2 === 1;
+
+      let media: MediaItem[];
+      let postType: PostType;
 
       if (isVideoPost) {
         // Single video post
@@ -83,7 +84,7 @@ class PostService {
           thumbnail: videoAsset.thumbnail,
         };
         media = [videoItem];
-        postTypeName = 'video';
+        postType = 'video';
       } else {
         // Exactly 2 images post (swipeable carousel) with thumbnails
         const image1 = shuffledImages[0];
@@ -102,7 +103,7 @@ class PostService {
             thumbnail: image2.thumbnail,
           },
         ];
-        postTypeName = 'images';
+        postType = 'images';
       }
 
       posts.push({
@@ -110,7 +111,7 @@ class PostService {
         userId: `user_${postIndex}`,
         username,
         userAvatar: undefined,
-        type: postTypeName,
+        type: postType,
         media,
         caption: CAPTIONS[postIndex % CAPTIONS.length],
         likes: Math.floor(Math.random() * 1000) + 50,

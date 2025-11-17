@@ -21,6 +21,7 @@ export const CustomVideoTimer = forwardRef<CustomVideoTimerRef, CustomVideoTimer
         updateFromProgress,
         reset,
       }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [],
     );
 

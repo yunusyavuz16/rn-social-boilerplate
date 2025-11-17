@@ -169,11 +169,15 @@ export const ImageSkeleton: React.FC<{ size?: number }> = ({ size }) => {
 export const GridSkeleton: React.FC<{ numColumns?: number }> = ({ numColumns = 3 }) => {
   const { width: SCREEN_WIDTH } = useBreakpoint();
   const itemSize = SCREEN_WIDTH / numColumns;
+  const skeletonItems = Array.from({ length: 6 }, (_, index) => ({
+    id: `skeleton-${index}`,
+    index,
+  }));
 
   return (
     <ThemedView style={gridSkeletonStyles.container}>
-      {Array.from({ length: 6 }).map((_, index) => (
-        <ImageSkeleton key={index} size={itemSize} />
+      {skeletonItems.map(item => (
+        <ImageSkeleton key={item.id} size={itemSize} />
       ))}
     </ThemedView>
   );

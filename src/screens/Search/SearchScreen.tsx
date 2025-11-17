@@ -1,6 +1,5 @@
 import { BackButton } from '@/components/Molecules/BackButton/BackButton';
 import { EmptyState } from '@/components/Molecules/EmptyState/EmptyState';
-import { MediaGrid } from '@/screens/Search/components/MediaGrid/MediaGrid';
 import { GridSkeleton } from '@/components/Molecules/Skeleton/Skeleton';
 import { useBreakpoint } from '@hooks/useBreakpoint';
 import { useSearchRTK } from '@/screens/Search/hooks/useSearchRTK';
@@ -13,6 +12,7 @@ import { useResponsiveColumns } from '@/screens/Search/hooks/useResponsiveColumn
 import { useSearchInput } from '@/screens/Search/hooks/useSearchInput';
 import { useAutoFocus } from '@/screens/Search/hooks/useAutoFocus';
 import { SearchHeader } from '@/components/Organisms/SearchHeader/SearchHeader';
+import { MediaGrid } from '@/components/Organisms/MediaGrid/MediaGrid';
 
 /**
  * Displays search results in a responsive grid with auto-playing videos.

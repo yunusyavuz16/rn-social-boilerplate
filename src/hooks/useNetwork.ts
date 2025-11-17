@@ -2,8 +2,11 @@ import {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {NetInfoStateType} from '@react-native-community/netinfo';
 import {networkService} from '@services/networkService';
-import {setNetworkState} from '@store/slices/networkSlice';
-import {selectIsOnline, selectNetworkState} from '@store/slices/networkSlice';
+import {
+  selectIsOnline,
+  selectNetworkState,
+  setNetworkState,
+} from '@store/slices/networkSlice';
 import type {RootState} from '@store/store';
 
 export const useNetwork = () => {

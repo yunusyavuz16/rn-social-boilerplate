@@ -66,66 +66,66 @@ class ImageCacheService {
     }
   }
 
+  private collectThumbnailsToPrefetch(
+    items: Array<{uri: string | number; thumbnailUri?: string | number}>,
+  ): string[] {
+    const thumbnailsToPrefetch: string[] = [];
+    for (const {thumbnailUri} of items) {
+      if (thumbnailUri && typeof thumbnailUri === 'string') {
+        if (!this.prefetchedThumbnails.has(thumbnailUri)) {
+          thumbnailsToPrefetch.push(thumbnailUri);
+          this.prefetchedThumbnails.add(thumbnailUri);
+        }
+      }
+    }
+    return thumbnailsToPrefetch;
+  }
+
+  private collectImagesToPrefetch(
+    items: Array<{uri: string | number; thumbnailUri?: string | number}>,
+  ): string[] {
+    const imagesToPrefetch: string[] = [];
+    for (const {uri} of items) {
+      if (typeof uri === 'string') {
+        if (!this.prefetchedImages.has(uri)) {
+          imagesToPrefetch.push(uri);
+          this.prefetchedImages.add(uri);
+        }
+      }
+    }
+    return imagesToPrefetch;
+  }
+
+  private preloadImages(uris: string[], priority: CachePriority): void {
+    if (uris.length === 0) {
+      return;
+    }
+    try {
+      FastImage.preload(
+        uris.map(uri => ({
+          uri,
+          priority: this.getCachePriority(priority),
+        })),
+      );
+    } catch (error) {
+      console.warn('Error prefetching images:', error);
+    }
+  }
 
   prefetchImages(
     items: Array<{uri: string | number; thumbnailUri?: string | number}>,
     priority: CachePriority = CachePriority.NORMAL,
   ): void {
-    const thumbnailsToPrefetch: string[] = [];
-    const imagesToPrefetch: string[] = [];
-
-    items.forEach(({uri, thumbnailUri}) => {
-      // Collect thumbnails
-      if (thumbnailUri && typeof thumbnailUri === 'string') {
-        const thumbKey = thumbnailUri;
-        if (!this.prefetchedThumbnails.has(thumbKey)) {
-          thumbnailsToPrefetch.push(thumbKey);
-          this.prefetchedThumbnails.add(thumbKey);
-        }
-      }
-
-      // Collect full images
-      if (typeof uri === 'string') {
-        const imageKey = uri;
-        if (!this.prefetchedImages.has(imageKey)) {
-          imagesToPrefetch.push(imageKey);
-          this.prefetchedImages.add(imageKey);
-        }
-      }
-    });
+    const thumbnailsToPrefetch = this.collectThumbnailsToPrefetch(items);
+    const imagesToPrefetch = this.collectImagesToPrefetch(items);
 
     // Prefetch thumbnails first (smaller files)
-    if (thumbnailsToPrefetch.length > 0) {
-      try {
-        FastImage.preload(
-          thumbnailsToPrefetch.map(uri => ({
-            uri,
-            priority: this.getCachePriority(priority),
-          })),
-        );
-      } catch (error) {
-        console.warn('Error prefetching thumbnails:', error);
-      }
-    }
+    this.preloadImages(thumbnailsToPrefetch, priority);
 
     // Prefetch full images
-    if (imagesToPrefetch.length > 0) {
-      try {
-        FastImage.preload(
-          imagesToPrefetch.map(uri => ({
-            uri,
-            priority: this.getCachePriority(priority),
-          })),
-        );
-      } catch (error) {
-        console.warn('Error prefetching images:', error);
-      }
-    }
+    this.preloadImages(imagesToPrefetch, priority);
   }
 
-  /**
-   * Check if an image is already prefetched
-   */
   isPrefetched(uri: string | number): boolean {
     if (typeof uri === 'string') {
       return this.prefetchedImages.has(uri);
@@ -133,9 +133,6 @@ class ImageCacheService {
     return false;
   }
 
-  /**
-   * Check if a thumbnail is already prefetched
-   */
   isThumbnailPrefetched(thumbnailUri: string | number): boolean {
     if (typeof thumbnailUri === 'string') {
       return this.prefetchedThumbnails.has(thumbnailUri);
@@ -143,18 +140,11 @@ class ImageCacheService {
     return false;
   }
 
-  /**
-   * Clear prefetch tracking (does not clear FastImage cache)
-   */
   clearPrefetchTracking(): void {
     this.prefetchedImages.clear();
     this.prefetchedThumbnails.clear();
   }
 
-  /**
-   * Clear FastImage disk cache
-   * Note: This is an async operation
-   */
   async clearDiskCache(): Promise<void> {
     try {
       await FastImage.clearDiskCache();
@@ -163,32 +153,18 @@ class ImageCacheService {
     }
   }
 
-  /**
-   * Clear FastImage memory cache
-   */
   clearMemoryCache(): void {
-    try {
-      FastImage.clearMemoryCache();
-    } catch (error) {
+    FastImage.clearMemoryCache().catch(error => {
       console.warn('Error clearing memory cache:', error);
-    }
+    });
   }
 
-  /**
-   * Clear all caches (memory + disk + tracking)
-   */
   async clearAllCaches(): Promise<void> {
     this.clearMemoryCache();
     await this.clearDiskCache();
     this.clearPrefetchTracking();
   }
 
-  /**
-   * Get cache source configuration for FastImage
-   * @param uri - Image URI
-   * @param cacheMode - Cache mode (default: immutable for local assets, web for URLs)
-   * @param priority - Cache priority
-   */
   getCacheSource(
     uri: string | number,
     cacheMode?: CacheMode,

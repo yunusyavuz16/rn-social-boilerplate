@@ -25,7 +25,7 @@ export const useVideoTimer = ({
 }: UseVideoTimerParams): UseVideoTimerReturn => {
   const validDuration = isDurationValid(duration);
   const [remainingTime, setRemainingTime] = useState<number | null>(() =>
-    validDuration ? Math.floor(duration!) : null,
+    validDuration ? Math.floor(duration) : null,
   );
   const lastProgressRef = useRef(0);
 
@@ -36,7 +36,7 @@ export const useVideoTimer = ({
       return;
     }
 
-    setRemainingTime(Math.floor(duration!));
+    setRemainingTime(Math.floor(duration));
     lastProgressRef.current = 0;
   };
 
@@ -47,12 +47,12 @@ export const useVideoTimer = ({
 
     // Detect loop: progress restarting near zero after nearing duration end
     if (
-      lastProgressRef.current > Math.max(duration! - 1, 1) &&
+      lastProgressRef.current > Math.max(duration - 1, 1) &&
       progress <= LOOP_THRESHOLD_SECONDS
     ) {
-      setRemainingTime(Math.floor(duration!));
+      setRemainingTime(Math.floor(duration));
     } else {
-      setRemainingTime(Math.max(0, Math.floor(duration! - progress)));
+      setRemainingTime(Math.max(0, Math.floor(duration - progress)));
     }
 
     lastProgressRef.current = progress;

@@ -7,11 +7,7 @@ interface UseMediaPlayerVisibilityReturn {
   isItemVisible: (index: number) => boolean;
 }
 
-/**
- * Hook for tracking visible media items in a grid/list
- * Optimizes video autoplay by only playing visible items
- * Uses intersection observer pattern for memory efficiency
- */
+
 export const useMediaPlayerVisibility = (
   _itemVisiblePercentThreshold: number = 50,
 ): UseMediaPlayerVisibilityReturn => {
@@ -21,11 +17,11 @@ export const useMediaPlayerVisibility = (
 
   const onViewableItemsChanged = ({ viewableItems }: { viewableItems: ViewToken[] }) => {
     const newVisibleItems = new Set<number>();
-    viewableItems.forEach(item => {
+    for (const item of viewableItems) {
       if (item.index !== null && item.isViewable) {
         newVisibleItems.add(item.index);
       }
-    });
+    }
     setVisibleItems(newVisibleItems);
   };
 
