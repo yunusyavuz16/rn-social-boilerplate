@@ -1,8 +1,3 @@
-import React, { useEffect } from 'react';
-import { StatusBar } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Provider } from 'react-redux';
-import Orientation from 'react-native-orientation-locker';
 import { ThemedView } from '@/components/Atoms/ThemedView/ThemedView';
 import { OfflineNotification } from '@/components/Molecules/OfflineNotification/OfflineNotification';
 import { ErrorBoundary } from '@/components/Organisms/ErrorBoundary/ErrorBoundary';
@@ -11,7 +6,12 @@ import { useTheme } from '@hooks/useTheme';
 import { AppNavigator } from '@navigation/AppNavigator';
 import { store } from '@store/store';
 import { createTheme } from '@styles/theme';
+import React from 'react';
+import { StatusBar } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Provider } from 'react-redux';
 import { styles } from './app.styles';
+import { useLockOrientation } from './hooks/useLockOrientation';
 
 /**
  * App content component that uses theme
@@ -20,13 +20,7 @@ import { styles } from './app.styles';
 const AppContent: React.FC = () => {
   const { theme, isInitialized } = useTheme();
 
-  useEffect(() => {
-    Orientation.lockToPortrait();
-
-    return () => {
-      Orientation.unlockAllOrientations();
-    };
-  }, []);
+  useLockOrientation();
 
   // Use current theme or fallback to light theme during initialization
   const currentTheme = isInitialized ? theme : createTheme('light');
