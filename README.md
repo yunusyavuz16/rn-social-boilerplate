@@ -129,7 +129,7 @@ npm test -- --coverage   # Test coverage raporu
 
 ### 8. React Hooks
 - Functional components only
-- Custom hooks: `useAuthRTK`, `useFeedRTK`, `useSearchRTK`, `useImagePrefetch`, `useMediaPlayerVisibility`, `useBreakpoint`
+- Custom hooks: `useAuthRTK`, `useGetPosts`, `useSearchRTK`, `useImagePrefetch`, `useMediaPlayerVisibility`, `useBreakpoint`
 
 ### 9. Responsive Design
 - Breakpoint system: xs, sm, md, lg, xl

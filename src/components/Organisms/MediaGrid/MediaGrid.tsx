@@ -1,64 +1,111 @@
+import { ThemedText } from '@/components/Atoms/ThemedText/ThemedText';
+import { ThemedView } from '@/components/Atoms/ThemedView/ThemedView';
+import { EmptyState } from '@/components/Molecules/EmptyState/EmptyState';
+import { PostSkeleton } from '@/components/Molecules/Skeleton/Skeleton';
+import { useGetPosts } from '@/hooks/useGetPosts';
+import { useResponsiveColumns } from '@/screens/Search/hooks/useResponsiveColumns';
+import { MediaItem } from '@/types/post.types';
 import { useBreakpoint } from '@hooks/useBreakpoint';
 import { useImagePrefetch } from '@hooks/useImagePrefetch';
 import { useMediaPlayerVisibility } from '@hooks/useMediaPlayerVisibility';
 import { useTheme } from '@hooks/useTheme';
-import React, { useEffect, useRef } from 'react';
-import { FlatList, Platform, View } from 'react-native';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
 import { createStyles } from './MediaGrid.styles';
 import { MediaGridItem } from './components/MediaGridItem';
-import { MediaItem } from '@/types/post.types';
 
-interface MediaGridProps {
-  data: MediaItem[];
-  numColumns?: number;
-}
-
-export const MediaGrid: React.FC<MediaGridProps> = ({ data, numColumns: propNumColumns }) => {
+export const MediaGrid: React.FC<{ searchQuery: string }> = ({ searchQuery }) => {
   const { width: SCREEN_WIDTH } = useBreakpoint();
   const { theme } = useTheme();
-  const styles = createStyles(theme);
   const { breakpoint } = useBreakpoint();
-  const { visibleItems, onViewableItemsChanged, isItemVisible } = useMediaPlayerVisibility(50);
+  const styles = createStyles(theme, breakpoint);
+
+  const { posts, isLoading, isLoadingMore, error, hasMore, refresh, loadMore } = useGetPosts();
   const { prefetchImages } = useImagePrefetch();
-  const viewabilityConfig = useRef({
+  const { onViewableItemsChanged, isItemVisible } = useMediaPlayerVisibility(50);
+
+  const numColumns = useResponsiveColumns({ breakpoint });
+
+  const viewabilityConfigRef = useRef({
     itemVisiblePercentThreshold: 50,
+    minimumViewTime: 200,
   });
 
-  // Calculate responsive numColumns based on breakpoint
-  const numColumns = (() => {
-    if (propNumColumns) {
-      return propNumColumns;
-    }
-    if (breakpoint === 'xl' || breakpoint === 'lg') {
-      return 5;
-    }
-    if (breakpoint === 'md') {
-      return 4;
-    }
-    return 3;
-  })();
+  const viewabilityConfigCallbackPairs = useRef([
+    {
+      viewabilityConfig: viewabilityConfigRef.current,
+      onViewableItemsChanged,
+    },
+  ]);
 
-  // Prefetch visible items with thumbnails
+  const handleEndReached = () => {
+    if (hasMore && !isLoadingMore) {
+      loadMore();
+    }
+  };
+
+  // Prefetch next posts' media when scrolling (with thumbnails)
   useEffect(() => {
-    if (data.length > 0 && visibleItems.size > 0) {
-      const visibleIndices: number[] = Array.from(visibleItems).slice(0, 12);
-      const imageItems = visibleIndices
-        .map(index => data[index])
-        .filter(item => item?.type === 'image')
-        .map(item => ({ uri: item.uri, thumbnailUri: item.thumbnail }));
-      if (imageItems.length > 0) {
-        prefetchImages(imageItems);
+    if (posts.length > 0) {
+      const mediaItems = posts.flatMap(post =>
+        post.media
+          .filter(m => m.type === 'image')
+          .map(m => ({ uri: m.uri, thumbnailUri: m.thumbnail })),
+      );
+      if (mediaItems.length > 0) {
+        prefetchImages(mediaItems);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, visibleItems]);
+  }, [posts]);
 
-  const { itemWidth, itemHeight } = (() => {
+  const renderFooter = () => {
+    if (!hasMore && posts.length > 0) {
+      return (
+        <ThemedView style={styles.endMessage}>
+          <ThemedText style={styles.endMessageText}>No more posts</ThemedText>
+        </ThemedView>
+      );
+    }
+
+    if (!isLoadingMore) {
+      return null;
+    }
+
+    return (
+      <ThemedView style={styles.footerLoader}>
+        <ActivityIndicator size="small" color={theme.colors.primary} />
+      </ThemedView>
+    );
+  };
+
+  const renderEmpty = () => {
+    // Show loading skeleton during initial load
+    if (isLoading) {
+      const skeletonItems = Array.from({ length: 3 }, (_, i) => ({
+        id: `skeleton-${i}`,
+      }));
+      return (
+        <ThemedView style={styles.emptyContainer}>
+          {skeletonItems.map(item => (
+            <PostSkeleton key={item.id} />
+          ))}
+        </ThemedView>
+      );
+    }
+    if (error) {
+      return <EmptyState type="network" message={error.message} onRetry={refresh} />;
+    }
+    // Only show "no posts yet" when loading is complete and there are no posts
+    return <EmptyState type="feed" />;
+  };
+
+  const { itemWidth } = (() => {
     const width = SCREEN_WIDTH / numColumns;
-    // 4:5 aspect ratio: height = width * (5/4) = width * 1.25
-    const height = width * 1.25;
-    return { itemWidth: width, itemHeight: height };
+    return { itemWidth: width };
   })();
+
+  const keyExtractor = (item: MediaItem) => item.id;
 
   const renderItem = ({ item, index }: { item: MediaItem; index: number }) => {
     const isVisible = isItemVisible(index);
@@ -76,33 +123,42 @@ export const MediaGrid: React.FC<MediaGridProps> = ({ data, numColumns: propNumC
     );
   };
 
-  const keyExtractor = (item: MediaItem) => item.id;
+  // Extract media from posts and create mapping
+  const media = useMemo(() => {
+    const mediaItems: MediaItem[] = [];
+    const filteredPosts = posts.filter(p =>
+      p.caption.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+    for (const post of filteredPosts) {
+      for (const mediaItem of post.media) {
+        mediaItems.push(mediaItem);
+      }
+    }
 
-  const getItemLayout = (_: unknown, index: number) => {
-    const row = Math.floor(index / numColumns);
-    return {
-      length: itemHeight, // Height of each item (4:5 aspect ratio)
-      offset: row * itemHeight, // Cumulative offset based on row
-      index,
-    };
-  };
+    return mediaItems
+  }, [posts, searchQuery]);
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={data}
+        data={media}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         numColumns={numColumns}
+        showsVerticalScrollIndicator={false}
         style={styles.grid}
-        removeClippedSubviews={Platform.OS === 'android'}
-        maxToRenderPerBatch={Platform.OS === 'android' ? 6 : 8}
-        windowSize={Platform.OS === 'android' ? 5 : 3}
-        initialNumToRender={Platform.OS === 'android' ? 12 : 6}
-        updateCellsBatchingPeriod={Platform.OS === 'android' ? 80 : 50}
-        getItemLayout={getItemLayout}
-        onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={viewabilityConfig.current}
+        removeClippedSubviews
+        maxToRenderPerBatch={3}
+        windowSize={5}
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.8}
+        ListFooterComponent={renderFooter}
+        ListEmptyComponent={renderEmpty}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refresh} />}
+        // Memory optimization: track visible items to pause off-screen videos
+        viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
+        initialNumToRender={2}
+        updateCellsBatchingPeriod={100}
       />
     </View>
   );

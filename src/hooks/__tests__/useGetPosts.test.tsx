@@ -1,15 +1,15 @@
 /**
- * Tests for useFeedRTK hook
+ * Tests for useGetPosts hook
  * Covers feed post management, pagination, and like functionality
  */
 
 import React from 'react';
 import {renderHook, waitFor, act} from '@testing-library/react-native';
-import {useFeedRTK} from '../useFeedRTK';
+import {useGetPosts} from '../useGetPosts';
 import {Provider} from 'react-redux';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {ThemeProvider} from '@contexts/ThemeContext';
-import {createTestStore, defaultTestState, createMockPost} from '../../../../__tests__/utils/testUtils';
+import {createTestStore, defaultTestState, createMockPost} from '../../__tests__/utils/testUtils';
 
 // Mock RTK Query hooks
 const mockGetPostsQuery = jest.fn();
@@ -20,7 +20,7 @@ jest.mock('@store/api/postsApi', () => ({
   useToggleLikeMutation: () => mockToggleLikeMutation(),
 }));
 
-describe('useFeedRTK', () => {
+describe('useGetPosts', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
@@ -58,7 +58,7 @@ describe('useFeedRTK', () => {
   };
 
   it('should return initial state', () => {
-    const {result} = renderHook(() => useFeedRTK(), {wrapper: createWrapper()});
+    const {result} = renderHook(() => useGetPosts(), {wrapper: createWrapper()});
 
     expect(result.current.posts).toEqual([]);
     expect(result.current.isLoading).toBe(true);
@@ -77,7 +77,7 @@ describe('useFeedRTK', () => {
       refetch: jest.fn(),
     });
 
-    const {result} = renderHook(() => useFeedRTK(), {wrapper: createWrapper()});
+    const {result} = renderHook(() => useGetPosts(), {wrapper: createWrapper()});
 
     await waitFor(
       () => {
@@ -97,7 +97,7 @@ describe('useFeedRTK', () => {
       refetch: jest.fn(),
     });
 
-    const {result} = renderHook(() => useFeedRTK(), {wrapper: createWrapper()});
+    const {result} = renderHook(() => useGetPosts(), {wrapper: createWrapper()});
 
     await waitFor(() => {
       expect(result.current.posts.length).toBe(1);
@@ -132,7 +132,7 @@ describe('useFeedRTK', () => {
       refetch: mockRefetch,
     });
 
-    const {result} = renderHook(() => useFeedRTK(), {wrapper: createWrapper()});
+    const {result} = renderHook(() => useGetPosts(), {wrapper: createWrapper()});
 
     await waitFor(() => {
       expect(result.current.posts.length).toBe(1);
@@ -157,7 +157,7 @@ describe('useFeedRTK', () => {
     });
     mockToggleLikeMutation.mockReturnValue([mockToggleLike, {isLoading: false}]);
 
-    const {result} = renderHook(() => useFeedRTK(), {wrapper: createWrapper()});
+    const {result} = renderHook(() => useGetPosts(), {wrapper: createWrapper()});
 
     await waitFor(() => {
       expect(result.current.posts.length).toBe(1);
@@ -179,7 +179,7 @@ describe('useFeedRTK', () => {
       refetch: jest.fn(),
     });
 
-    const {result} = renderHook(() => useFeedRTK(), {wrapper: createWrapper()});
+    const {result} = renderHook(() => useGetPosts(), {wrapper: createWrapper()});
 
     await waitFor(() => {
       expect(result.current.error).toBeTruthy();

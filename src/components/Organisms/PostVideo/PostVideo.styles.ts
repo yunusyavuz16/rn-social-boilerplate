@@ -1,15 +1,14 @@
-import {StyleSheet} from 'react-native';
-import type {Theme} from '@styles/theme';
+import { StyleSheet } from 'react-native';
 
 /**
  * Create styles based on theme
  */
-export const createStyles = (theme: Theme) =>
+export const createStyles = () =>
   StyleSheet.create({
     container: {
       width: '100%',
       aspectRatio: 4 / 5, // 4:5 ratio for videos
-      backgroundColor: theme.colors.black,
+      backgroundColor: 'transparent',
       overflow: 'hidden', // Hide any controls that might appear outside bounds
     },
     video: {

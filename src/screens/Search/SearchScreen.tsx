@@ -1,65 +1,28 @@
 import { BackButton } from '@/components/Molecules/BackButton/BackButton';
-import { EmptyState } from '@/components/Molecules/EmptyState/EmptyState';
-import { GridSkeleton } from '@/components/Molecules/Skeleton/Skeleton';
+import { MediaGrid } from '@/components/Organisms/MediaGrid/MediaGrid';
+import { SearchHeader } from '@/components/Organisms/SearchHeader/SearchHeader';
+import { useAutoFocus } from '@/screens/Search/hooks/useAutoFocus';
 import { useBreakpoint } from '@hooks/useBreakpoint';
-import { useSearchRTK } from '@/screens/Search/hooks/useSearchRTK';
 import { useTheme } from '@hooks/useTheme';
-import React, { useRef } from 'react';
+import React, { useDeferredValue, useRef, useState } from 'react';
 import { TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createStyles } from './SearchScreen.styles';
-import { useResponsiveColumns } from '@/screens/Search/hooks/useResponsiveColumns';
-import { useSearchInput } from '@/screens/Search/hooks/useSearchInput';
-import { useAutoFocus } from '@/screens/Search/hooks/useAutoFocus';
-import { SearchHeader } from '@/components/Organisms/SearchHeader/SearchHeader';
-import { MediaGrid } from '@/components/Organisms/MediaGrid/MediaGrid';
 
 /**
  * Displays search results in a responsive grid with auto-playing videos.
  */
 export const SearchScreen: React.FC = () => {
-  const {theme} = useTheme();
-  const {media, isLoading, error, search, clearSearch, hasInitialContent} = useSearchRTK();
-  const {breakpoint} = useBreakpoint();
+  const { theme } = useTheme();
+
+  const [searchQueryState, setSearchQuery] = useState('');
+  const deferredQuery = useDeferredValue(searchQueryState);
+
+  const { breakpoint } = useBreakpoint();
   const searchInputRef = useRef<TextInput>(null);
-  const numColumns = useResponsiveColumns({breakpoint});
-  const {searchQuery, handleSearchChange, retrySearch, hasSearchQuery} = useSearchInput({
-    search,
-    clearSearch,
-  });
-  useAutoFocus({inputRef: searchInputRef});
+
+  useAutoFocus({ inputRef: searchInputRef });
   const styles = createStyles(theme, breakpoint);
-
-  const renderContent = () => {
-    if (isLoading) {
-      return <GridSkeleton numColumns={numColumns} />;
-    }
-
-    if (error) {
-      return (
-        <EmptyState
-          type="network"
-          message={error.message}
-          onRetry={retrySearch}
-        />
-      );
-    }
-
-    if (media.length === 0 && hasSearchQuery) {
-      return <EmptyState type="search" />;
-    }
-
-    if (media.length === 0 && !hasInitialContent) {
-      return <GridSkeleton numColumns={numColumns} />;
-    }
-
-    return (
-      <MediaGrid
-        data={media}
-        numColumns={numColumns}
-      />
-    );
-  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -71,14 +34,13 @@ export const SearchScreen: React.FC = () => {
         }
         searchBarRef={searchInputRef}
         searchBarProps={{
-          value: searchQuery,
-          onChangeText: handleSearchChange,
+          value: searchQueryState,
+          onChangeText: setSearchQuery,
           placeholder: 'Search...',
         }}
         testID="search-screen-header"
       />
-      {renderContent()}
+      <MediaGrid searchQuery={deferredQuery} />
     </SafeAreaView>
   );
 };
-

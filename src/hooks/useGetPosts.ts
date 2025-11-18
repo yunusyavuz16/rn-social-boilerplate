@@ -1,8 +1,8 @@
 import { useGetPostsQuery, useToggleLikeMutation } from '@store/api/postsApi';
 import { useEffect, useState } from 'react';
-import type { Post } from '../../../types/post.types';
+import type { Post } from '../types/post.types';
 
-interface UseFeedRTKReturn {
+interface UseGetPostsReturn {
   posts: Post[];
   isLoading: boolean;
   isLoadingMore: boolean;
@@ -10,6 +10,7 @@ interface UseFeedRTKReturn {
   hasMore: boolean;
   refresh: () => void;
   loadMore: () => void;
+  isFetching: boolean;
   toggleLike: (postId: string) => void;
 }
 
@@ -17,7 +18,7 @@ interface UseFeedRTKReturn {
  * Hook for managing feed posts with RTK Query
  * Handles pagination and optimistic updates
  */
-export const useFeedRTK = (): UseFeedRTKReturn => {
+export const useGetPosts = (): UseGetPostsReturn => {
   const [page, setPage] = useState(1);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
 
@@ -133,6 +134,7 @@ export const useFeedRTK = (): UseFeedRTKReturn => {
   return {
     posts: allPosts,
     isLoading: isInitialLoading,
+    isFetching,
     isLoadingMore: isFetching && page > 1,
     error: (() => {
       if (!queryError) {

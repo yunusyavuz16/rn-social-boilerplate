@@ -30,6 +30,7 @@ export const MediaGridItem: React.FC<MediaGridItemProps> = React.memo(
             resizeMode={FastImage.resizeMode.cover}
           />
         ) : (
+          isVisible ? (
           <PostVideo
             video={{ id, type, uri, thumbnail, duration }}
             paused={!isVisible}
@@ -38,6 +39,13 @@ export const MediaGridItem: React.FC<MediaGridItemProps> = React.memo(
             showTimer={true}
             enableTapToPlay={false}
           />
+          ) : (
+            <FastImage
+              source={thumbnailSource}
+              style={styles.image}
+              resizeMode={FastImage.resizeMode.cover}
+            />
+          )
         )}
       </View>
     );

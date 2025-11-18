@@ -3,8 +3,8 @@ import { ThemedView } from '@/components/Atoms/ThemedView/ThemedView';
 import { EmptyState } from '@/components/Molecules/EmptyState/EmptyState';
 import { PostSkeleton } from '@/components/Molecules/Skeleton/Skeleton';
 import { Post } from '@/components/Organisms/Post/Post';
+import { useGetPosts } from '@/hooks/useGetPosts';
 import { FeedHeader } from '@/screens/Feed/components/FeedHeader/FeedHeader';
-import { useFeedRTK } from '@/screens/Feed/hooks/useFeedRTK';
 import { useBreakpoint } from '@hooks/useBreakpoint';
 import { useImagePrefetch } from '@hooks/useImagePrefetch';
 import { useMediaPlayerVisibility } from '@hooks/useMediaPlayerVisibility';
@@ -20,7 +20,7 @@ export const FeedScreen: React.FC = () => {
   const { breakpoint } = useBreakpoint();
   const styles = createStyles(theme, breakpoint);
   const { posts, isLoading, isLoadingMore, error, hasMore, refresh, loadMore, toggleLike } =
-    useFeedRTK();
+    useGetPosts();
   const { prefetchImages } = useImagePrefetch();
   const { onViewableItemsChanged, isItemVisible } = useMediaPlayerVisibility(50);
 
@@ -28,6 +28,13 @@ export const FeedScreen: React.FC = () => {
     itemVisiblePercentThreshold: 50,
     minimumViewTime: 200,
   });
+
+  const viewabilityConfigCallbackPairs = useRef([
+    {
+      viewabilityConfig: viewabilityConfigRef.current,
+      onViewableItemsChanged,
+    },
+  ]);
 
   const handleLike = useCallback((postId: string) => {
     toggleLike(postId);
@@ -123,13 +130,6 @@ export const FeedScreen: React.FC = () => {
     // Only show "no posts yet" when loading is complete and there are no posts
     return <EmptyState type="feed" />;
   };
-
-  const viewabilityConfigCallbackPairs = useRef([
-    {
-      viewabilityConfig: viewabilityConfigRef.current,
-      onViewableItemsChanged,
-    },
-  ]);
 
   return (
     <SafeAreaView style={styles.container}>

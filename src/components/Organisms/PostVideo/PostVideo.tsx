@@ -1,11 +1,10 @@
-import { useTheme } from '@hooks/useTheme';
+import { CustomVideo } from '@/components/Molecules/CustomVideo/CustomVideo';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import type { OnLoadData } from 'react-native-video';
 import type { MediaItem } from '../../../types/post.types';
 import { createStyles } from './PostVideo.styles';
-import { CustomVideo } from '@/components/Molecules/CustomVideo/CustomVideo';
 
 interface PostVideoProps {
   video: MediaItem;
@@ -24,8 +23,7 @@ export const PostVideo: React.FC<PostVideoProps> = ({
   showTimer,
   enableTapToPlay,
 }) => {
-  const { theme } = useTheme();
-  const styles = createStyles(theme);
+  const styles = createStyles();
   const [hasVideoError, setHasVideoError] = useState(false);
 
   const handleVideoLoad = (_event: OnLoadData) => {

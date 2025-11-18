@@ -4,12 +4,12 @@
  */
 
 import React from 'react';
-import {FeedScreen} from '../FeedScreen';
-import {renderWithProviders, createMockPost} from '../../../__tests__/utils/testUtils';
-import type {Post} from '../../../types/post.types';
+import { createMockPost, renderWithProviders } from '../../../__tests__/utils/testUtils';
+import type { Post } from '../../../types/post.types';
+import { FeedScreen } from '../FeedScreen';
 
 // Mock hooks
-const mockUseFeedRTK: {
+const mockUseGetPosts: {
   posts: Post[];
   isLoading: boolean;
   isLoadingMore: boolean;
@@ -29,8 +29,8 @@ const mockUseFeedRTK: {
   toggleLike: jest.fn(),
 };
 
-jest.mock('../hooks/useFeedRTK', () => ({
-  useFeedRTK: () => mockUseFeedRTK,
+jest.mock('@/hooks/useGetPosts', () => ({
+  useGetPosts: () => mockUseGetPosts,
 }));
 
 jest.mock('@hooks/useImagePrefetch', () => ({
@@ -49,25 +49,22 @@ jest.mock('@hooks/useMediaPlayerVisibility', () => ({
 describe('FeedScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseFeedRTK.posts = [];
-    mockUseFeedRTK.isLoading = false;
-    mockUseFeedRTK.error = null;
-    mockUseFeedRTK.hasMore = true;
+    mockUseGetPosts.posts = [];
+    mockUseGetPosts.isLoading = false;
+    mockUseGetPosts.error = null;
+    mockUseGetPosts.hasMore = true;
   });
 
   it('should render feed screen', () => {
-    const {getByTestId} = renderWithProviders(<FeedScreen />);
+    const { getByTestId } = renderWithProviders(<FeedScreen />);
 
     // Feed should render
     expect(getByTestId).toBeDefined();
   });
 
   it('should render posts list', () => {
-    const posts: Post[] = [
-      createMockPost({id: 'post_1'}),
-      createMockPost({id: 'post_2'}),
-    ];
-    mockUseFeedRTK.posts = posts as Post[];
+    const posts: Post[] = [createMockPost({ id: 'post_1' }), createMockPost({ id: 'post_2' })];
+    mockUseGetPosts.posts = posts as Post[];
 
     renderWithProviders(<FeedScreen />);
 
@@ -75,18 +72,18 @@ describe('FeedScreen', () => {
   });
 
   it('should show loading skeleton when loading', () => {
-    mockUseFeedRTK.isLoading = true;
+    mockUseGetPosts.isLoading = true;
 
     renderWithProviders(<FeedScreen />);
 
     // Should show skeleton during loading
-    expect(mockUseFeedRTK.isLoading).toBe(true);
+    expect(mockUseGetPosts.isLoading).toBe(true);
   });
 
   it('should show error message when error exists', () => {
-    mockUseFeedRTK.error = new Error('Failed to load posts') as Error | null;
+    mockUseGetPosts.error = new Error('Failed to load posts') as Error | null;
 
-    const {getByText} = renderWithProviders(<FeedScreen />);
+    const { getByText } = renderWithProviders(<FeedScreen />);
 
     expect(getByText(/Error:/)).toBeTruthy();
   });
@@ -96,47 +93,46 @@ describe('FeedScreen', () => {
 
     // Simulate pull to refresh
     // This would typically be done through FlatList's refreshControl
-    expect(mockUseFeedRTK.refresh).toBeDefined();
+    expect(mockUseGetPosts.refresh).toBeDefined();
   });
 
   it('should call loadMore when reaching end', () => {
-    mockUseFeedRTK.posts = [createMockPost()];
-    mockUseFeedRTK.hasMore = true;
+    mockUseGetPosts.posts = [createMockPost()];
+    mockUseGetPosts.hasMore = true;
 
     renderWithProviders(<FeedScreen />);
 
     // loadMore should be called when end is reached
     // This is typically handled by FlatList's onEndReached
-    expect(mockUseFeedRTK.loadMore).toBeDefined();
+    expect(mockUseGetPosts.loadMore).toBeDefined();
   });
 
   it('should show empty state when no posts', () => {
-    mockUseFeedRTK.posts = [];
-    mockUseFeedRTK.isLoading = false;
+    mockUseGetPosts.posts = [];
+    mockUseGetPosts.isLoading = false;
 
     renderWithProviders(<FeedScreen />);
 
     // Should show empty state
-    expect(mockUseFeedRTK.posts.length).toBe(0);
+    expect(mockUseGetPosts.posts.length).toBe(0);
   });
 
   it('should show footer loader when loading more', () => {
-    mockUseFeedRTK.posts = [createMockPost()];
-    mockUseFeedRTK.isLoadingMore = true;
-    mockUseFeedRTK.hasMore = true;
+    mockUseGetPosts.posts = [createMockPost()];
+    mockUseGetPosts.isLoadingMore = true;
+    mockUseGetPosts.hasMore = true;
 
     renderWithProviders(<FeedScreen />);
 
-    expect(mockUseFeedRTK.isLoadingMore).toBe(true);
+    expect(mockUseGetPosts.isLoadingMore).toBe(true);
   });
 
   it('should show end message when no more posts', () => {
-    mockUseFeedRTK.posts = [createMockPost()];
-    mockUseFeedRTK.hasMore = false;
+    mockUseGetPosts.posts = [createMockPost()];
+    mockUseGetPosts.hasMore = false;
 
-    const {getByText} = renderWithProviders(<FeedScreen />);
+    const { getByText } = renderWithProviders(<FeedScreen />);
 
     expect(getByText('No more posts')).toBeTruthy();
   });
 });
-
