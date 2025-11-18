@@ -1,97 +1,416 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# React Native Developer Case Study
 
-# Getting Started
+## Merhaba 👋
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+Bu dokümantasyon, Instagram klonu case study projesinin teknik mimarisi, karar gerekçeleri ve implementasyon detaylarını içermektedir.
 
-## Step 1: Start Metro
+---
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## 📋 İçindekiler
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+1. [Proje Amacı & Kapsam](#proje-amacı--kapsam)
+2. [Hızlı Başlama](#hızlı-başlama)
+3. [Feature Listesi](#feature-listesi)
+4. [Teknik Mimari](#teknik-mimari)
+5. [Folder Structure](#folder-structure)
+6. [Media Handling Stratejisi](#media-handling-stratejisi)
+7. [Video Davranışı](#video-davranışı)
+8. [Performans Optimizasyonları](#performans-optimizasyonları)
+9. [Authentication & Secure Storage](#authentication--secure-storage)
+10. [Test, Lint, TypeScript & SonarQube](#test-lint-typescript--sonarqube)
+11. [Bilinen Sınırlamalar](#bilinen-sınırlamalar)
+12. [Teslimat ve İletişim](#teslimat-ve-iletişim)
 
-```sh
-# Using npm
+---
+
+## 🎯 Proje Amacı & Kapsam
+
+**Production-ready** bir Instagram klonu case study'si. Temel gereksinimler:
+
+- ✅ Instagram benzeri feed ekranı (scrollable post listesi)
+- ✅ Post'lar: 2 görsel (swipeable carousel) veya 1 video
+- ✅ Güvenli login ekranı ve credential storage
+- ✅ Search ekranı (grid layout, video autoplay)
+- ✅ Mock API ile veri yönetimi
+- ✅ Tamamen custom component yapısı (Atomic Design)
+- ✅ 10MB+ görseller için optimize edilmiş performans
+- ✅ React Hooks tabanlı mimari
+- ✅ Responsive design (tüm ekran boyutları)
+
+**Teknik Hedefler:**
+- TypeScript strict mode
+- Test coverage ≥80%
+- Lint & TypeScript check geçişi
+- SonarQube entegrasyonu
+
+---
+
+## 🚀 Hızlı Başlama
+
+### Gereksinimler
+
+- Node.js >= 20
+- React Native CLI
+- iOS: Xcode, CocoaPods
+- Android: Android Studio, JDK
+
+### Kurulum
+
+```bash
+# Dependencies yükle
+npm install
+
+# iOS için CocoaPods (sadece ilk kurulumda)
+cd ios && bundle exec pod install && cd ..
+
+# Metro bundler'ı başlat
 npm start
 
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
+# Android'de çalıştır
 npm run android
 
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+# iOS'ta çalıştır
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### Kalite Kontrolleri
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+```bash
+npm run lint              # Lint kontrolü
+npx tsc --noEmit         # TypeScript type check
+npm test                 # Test çalıştır
+npm test -- --coverage   # Test coverage raporu
+```
 
-## Step 3: Modify your app
+---
 
-Now that you have successfully run the app, let's make changes!
+## ✅ Feature Listesi
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+### 1. Feed Ekranı
+- `FlatList` ile optimize edilmiş infinite scroll
+- Post tipleri: 2 görsel (swipeable) veya 1 video
+- Like işlevi (optimistic updates)
+- Pagination: `page` ve `limit` parametreleri
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+### 2. Login Ekranı
+- Username/password input'ları
+- Mock authentication (herhangi bir input başarılı)
+- `react-native-keychain` ile secure storage (iOS Keychain / Android Keystore)
+- RTK Query ile session management
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+### 3. Search Ekranı
+- Feed ekranının üstünde search bar
+- Responsive grid layout (3-5 kolon)
+- **Sadece thumbnail gösterimi** (yüksek performans için)
+- Video autoplay (viewport tracking ile)
+- Basit string matching (caption/username)
 
-## Congratulations! :tada:
+### 4. Video Handling
+- Pexels videos kaynağı
+- Autoplay: Viewport'ta olduğunda otomatik oynatma
+- Auto-pause: Viewport'tan çıktığında otomatik durdurma
+- Error fallback: Video yüklenemezse thumbnail gösterimi
 
-You've successfully run and modified your React Native App. :partying_face:
+### 5. Mock API
+- `postService` ile mock data generation
+- Page-based pagination (10 post per page)
+- String matching ile search
+- 500ms delay simülasyonu
 
-### Now what?
+### 6. Custom Component Yapısı
+- **Atomic Design Pattern**: Atoms → Molecules → Organisms
+- Her component kendi folder'ında (styles, types, tests ile)
+- Ekran kodları sadece component'leri kullanır
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+### 7. Büyük Görseller (10MB+) Optimizasyonu
+- **Progressive Loading**: Thumbnail → High-res image
+- **Image Caching**: `react-native-fast-image` (disk + memory)
+- **Prefetching**: Görünür item'ların önceden yüklenmesi
+- CPU/UI thread optimize edilmiş
 
-# Troubleshooting
+### 8. React Hooks
+- Functional components only
+- Custom hooks: `useAuthRTK`, `useFeedRTK`, `useSearchRTK`, `useImagePrefetch`, `useMediaPlayerVisibility`, `useBreakpoint`
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+### 9. Responsive Design
+- Breakpoint system: xs, sm, md, lg, xl
+- Dynamic layout: `useBreakpoint` hook
+- Grid columns: 3 (phone) → 4 (tablet) → 5 (desktop)
 
-# Learn More
+---
 
-To learn more about React Native, take a look at the following resources:
+## 🏗️ Teknik Mimari
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+### State Management: Redux Toolkit + RTK Query
+
+**Neden RTK Query?**
+- Built-in caching ve invalidation
+- Automatic loading/error states
+- TypeScript-first API
+- Minimal boilerplate
+
+**Slice Yapısı:**
+- `authSlice`: User session, access token
+- `authApi`: Login, logout, checkAuth endpoints
+- `postApi`: GetPosts, searchPosts endpoints
+
+### Navigation: React Navigation v6
+
+- Native Stack Navigator
+- Type-safe navigation (`RootStackParamList`)
+- Auth-based routing (`isAuthenticated` state'ine göre)
+
+### Styling: StyleSheet.create + Theme System
+
+- Theme Context (Light/Dark mode desteği)
+- StyleSheet.create (runtime performance)
+- Responsive styles (breakpoint-based)
+
+### Type Safety: TypeScript Strict Mode
+
+```typescript
+{
+  "strict": true,
+  "noImplicitAny": true,
+  "strictNullChecks": true,
+  "strictFunctionTypes": true
+}
+```
+
+---
+
+## 📁 Folder Structure
+
+```
+src/
+├── app.tsx                    # App entry point
+├── components/
+│   ├── Atoms/                 # Icon, ThemedText, ThemedView
+│   ├── Molecules/             # Button, Input, ImageWithThumbnail, CustomVideo
+│   └── Organisms/             # Post, PostImageCarousel, MediaGrid
+├── screens/
+│   ├── Feed/                  # Feed screen + hooks + styles
+│   ├── Login/                 # Login screen + hooks + styles
+│   ├── Search/                # Search screen + hooks + styles
+│   └── Profile/               # Profile screen
+├── navigation/
+│   ├── AppNavigator.tsx       # Main navigator
+│   └── types.ts               # Navigation types
+├── services/
+│   ├── authService.ts         # Mock auth logic
+│   ├── postService.ts         # Mock post data
+│   ├── secureStorageService.ts # Keychain wrapper
+│   └── imageCacheService.ts   # Image cache management
+├── store/
+│   ├── store.ts               # Redux store config
+│   ├── api/                   # RTK Query API slices
+│   └── slices/                # Redux slices
+├── hooks/                     # Custom hooks
+├── contexts/                  # Theme context
+├── types/                     # TypeScript types
+├── constants/                 # Constants
+└── utils/                     # Utilities
+```
+
+**Path Aliases:**
+- `@/` → `src/`
+- `@components/`, `@screens/`, `@services/`, `@hooks/`, vb.
+
+---
+
+## 🖼️ Media Handling Stratejisi
+
+### Feed Ekranı: Progressive Loading (Thumbnail → High-Res)
+
+**Strateji:**
+1. İlk render: Thumbnail göster (hızlı, düşük bandwidth)
+2. Arka planda: High-resolution image yükle
+3. Yüklenince: Thumbnail fade-out, high-res fade-in
+
+**Neden?**
+- UX: Anında görsel feedback
+- Performance: 10MB+ görseller decode edilirken UI donmaz
+- Memory: Thumbnail memory'de, high-res lazy load
+
+**Implementasyon:** `ImageWithThumbnail` component, `useProgressiveImage` hook, FastImage layers
+
+### Search Ekranı: Sadece Thumbnail
+
+**Strateji:** Grid'de sadece thumbnail göster, high-res yükleme yok
+
+**Neden?**
+- Grid Density: 12-20+ item aynı anda görünür
+- Memory: 20x 10MB = 200MB+ (kabul edilemez)
+- CPU: Decode işlemi çok maliyetli
+- UX: Grid'de preview yeterli, detay sayfası yok
+
+**Implementasyon:** `MediaGridItem` component, sadece thumbnail URI
+
+### Prefetch & Cache Stratejisi
+
+**Prefetch:**
+- Feed: İlk 5 post'un media'sı (thumbnail HIGH priority, full image NORMAL)
+- Search: Viewport'taki ilk 12 item'ın thumbnail'leri (HIGH priority)
+
+**Cache (react-native-fast-image):**
+- Memory Cache: RAM'de decoded images
+- Disk Cache: Persistent storage
+- Cache Modes: `immutable` (default), `web`, `cacheOnly`
+- Priority: HIGH (thumbnails), NORMAL (full images)
+
+---
+
+## 🎥 Video & Performans Optimizasyonları
+
+### Video Davranışı
+
+**Autoplay & Auto-pause:**
+- `useMediaPlayerVisibility` hook ile viewport tracking (50% threshold)
+- Viewport'ta değilse otomatik pause
+- Error fallback: Video yüklenemezse thumbnail gösterimi
+- Grid'de autoplay (Instagram/TikTok benzeri UX)
+
+**Video Performance:**
+- Buffer configuration: 15-50s buffer, 2.5s playback buffer
+- `aggressiveMemoryMode: true` → Background memory release
+- Native video player (hardware acceleration)
+
+### Performans Optimizasyonları
+
+**FlatList:**
+- Stable key props (`post.id`)
+- Memoization: `React.memo`, `useCallback`, `useMemo`
+- Infinite scroll pagination
+
+**Memory & CPU:**
+- FastImage native decode (UI thread'i block etmez)
+- Viewport dışındaki videolar unmount (virtualizasyon)
+- Lazy loading: Sadece görünür item'lar yüklenir
+- `react-native-reanimated` → UI thread'de 60 FPS animations
+
+**Android Debug vs Release:**
+- Debug mode: FPS drop normal (30-40 FPS) - Metro bundler overhead
+- Release mode: 60 FPS smooth - Hermes optimizations, minification
+- **Not:** Release build'de test edilmelidir
+
+---
+
+## 🔐 Authentication & Secure Storage
+
+**Authentication Flow:**
+1. User login → `useLogin` hook → RTK Query mutation
+2. Mock auth (her input başarılı) → `authService.login()`
+3. Refresh token Keychain'de saklanır (`secureStorageService`)
+4. Access token Redux state'te (memory-only)
+5. Navigation → Feed screen
+
+**Session Management:**
+- App açılışında `checkAuth` query → Keychain'den token okuma
+- Token varsa → Session restore, Feed screen
+- Token yoksa → Login screen
+
+**Secure Storage (react-native-keychain):**
+- iOS: Keychain Services (encrypted, hardware-backed)
+- Android: Keystore (hardware-backed encryption)
+- Access token: Memory-only (Redux state)
+- Refresh token: Secure storage (Keychain)
+
+---
+
+## 🧪 Test, Lint, TypeScript & SonarQube
+
+### Test Coverage (≥80%)
+
+**Jest + React Native Testing Library:**
+- Component, hook, service tests
+- Coverage threshold: branches, functions, lines, statements ≥80%
+
+```bash
+npm test                    # Test çalıştır
+npm test -- --coverage     # Coverage raporu
+```
+
+### ESLint & TypeScript
+
+- ESLint: `@react-native/eslint-config`, TypeScript-aware rules
+- TypeScript: Strict mode (`strict: true`, `noImplicitAny`, `strictNullChecks`)
+
+```bash
+npm run lint                # Lint check
+npx tsc --noEmit           # Type check
+```
+
+![Test, Lint & TypeScript Check Results](./documents/test-lint-tsc-check.png)
+
+### SonarQube
+
+- Configuration: `sonar-project.properties`
+- Quality gates: Coverage ≥80%, code smells, security vulnerabilities
+- LCOV report integration
+
+![SonarQube Analysis Results](./documents/sonarqube.png)
+
+---
+
+## ⚠️ Bilinen Sınırlamalar
+
+### Android Debug Mode Performance
+
+- **FPS Drop**: Debug mode'da FPS düşüklüğü normal (30-40 FPS)
+- **Çözüm**: Release build'de test et (`./gradlew assembleRelease`)
+
+### iOS Simulator Limitations
+
+- **Video Playback**: Simulator'da video decode yavaş olabilir
+- **Keychain**: Simulator Keychain bazen sync olmayabilir
+- **Çözüm**: Real device'da test et
+
+### Network Simulation
+
+- `API_CONFIG.MOCK_DELAY = 500ms` → Gerçek network latency simülasyonu
+- **Not**: Production'da gerçek API'ye geçildiğinde bu delay kaldırılmalı
+
+### Image Loading Edge Cases
+
+- 10MB+ images: İlk yüklemede decode süresi uzun olabilir (1-2 saniye)
+- Thumbnail strategy ile bu sorun minimize edilir
+- **Not**: Production'da CDN + image optimization önerilir
+
+---
+
+## 📧 Teslimat ve İletişim
+
+### Repository
+
+- **GitHub/Bitbucket**: [Repository URL]
+- **Branch**: `main`
+
+### Delivery Checklist
+
+✅ Kod tamamlandı
+✅ Test coverage ≥80%
+✅ Lint & TypeScript check geçti
+✅ SonarQube analizi yapıldı
+✅ README dokümantasyonu hazır
+
+### İletişim
+
+**Email**: developer.yunus.yavuz@gmail.com
+
+**Sorular için:**
+- Projede anlamadığın, emin olmadığın yerler olursa bizimle iletişime geçebilirsin.
+- Code review sırasında sorularını iletebilirsin.
+
+---
+
+## 🎓 Gelecek İyileştirmeler
+
+Real API Integration, Image/Video CDN, Biometric Auth, Push Notifications, Analytics, Crash Reporting, Deep Linking, Offline Support
+
+---
+
+## 🙏 Teşekkürler
+
+Zamanın için şimdiden çok teşekkürler! Umarım bu case study senin için değerli bir öğrenme deneyimi olmuştur.
+
+**Başarılar! 🚀**

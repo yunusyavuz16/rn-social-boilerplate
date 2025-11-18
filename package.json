@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "clean-node": "rm -rf node_modules && rm -rf yarn.lock package-lock.json && yarn install",
+    "clean-node": "rm -rf node_modules && rm -rf yarn.lock package-lock.json && npm install",
     "clean-ios": "cd ios && rm -rf build Pods Podfile.lock && pod install && cd ..",
     "clean-aos": "cd android/app && rm -rf build .cxx && cd .. && ./gradlew clean && cd .."
   },
