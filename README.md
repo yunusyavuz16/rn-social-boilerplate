@@ -356,13 +356,13 @@ npx tsc --noEmit           # Type check
 ### Android Debug Mode Performance
 
 - **FPS Drop**: Debug mode'da FPS düşüklüğü normal (30-40 FPS)
-- **Çözüm**: Release build'de test et (`./gradlew assembleRelease`)
+- **Çözüm**: Release build'de real device'da test et (`./gradlew assembleRelease`)
 
 ### iOS Simulator Limitations
 
 - **Video Playback**: Simulator'da video decode yavaş olabilir
 - **Keychain**: Simulator Keychain bazen sync olmayabilir
-- **Çözüm**: Real device'da test et
+- **Çözüm**: Release build'de real device' da test et
 
 ### Network Simulation
 
