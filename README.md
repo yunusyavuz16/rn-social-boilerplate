@@ -6,22 +6,6 @@ Bu dokümantasyon, Instagram klonu case study projesinin teknik mimarisi, karar 
 
 ---
 
-## 📋 İçindekiler
-
-1. [Proje Amacı & Kapsam](#proje-amacı--kapsam)
-2. [Hızlı Başlama](#hızlı-başlama)
-3. [Feature Listesi](#feature-listesi)
-4. [Teknik Mimari](#teknik-mimari)
-5. [Folder Structure](#folder-structure)
-6. [Media Handling Stratejisi](#media-handling-stratejisi)
-7. [Video Davranışı](#video-davranışı)
-8. [Performans Optimizasyonları](#performans-optimizasyonları)
-9. [Authentication & Secure Storage](#authentication--secure-storage)
-10. [Test, Lint, TypeScript & SonarQube](#test-lint-typescript--sonarqube)
-11. [Bilinen Sınırlamalar](#bilinen-sınırlamalar)
-
----
-
 ## 🎯 Proje Amacı & Kapsam
 
 **Production-ready** bir Instagram klonu case study'si. Temel gereksinimler:
@@ -249,7 +233,7 @@ src/
 
 **Prefetch:**
 - Feed: İlk 5 post'un media'sı (thumbnail HIGH priority, full image NORMAL)
-- Search: Viewport'taki ilk 12 item'ın thumbnail'leri (HIGH priority)
+- Search: Tüm postların image media'sı (thumbnail + full image, NORMAL priority) - `prefetchStrategy: 'all'` kullanılıyor
 
 **Cache (react-native-fast-image):**
 - Memory Cache: RAM'de decoded images
@@ -361,23 +345,20 @@ npx tsc --noEmit           # Type check
 ### iOS Simulator Limitations
 
 - **Video Playback**: Simulator'da video decode yavaş olabilir
-- **Keychain**: Simulator Keychain bazen sync olmayabilir
 - **Çözüm**: Release build'de real device' da test et
 
 ### Network Simulation
 
 - `API_CONFIG.MOCK_DELAY = 500ms` → Gerçek network latency simülasyonu
-- **Not**: Production'da gerçek API'ye geçildiğinde bu delay kaldırılmalı
 
 ### Image Loading Edge Cases
 
 - 10MB+ images: İlk yüklemede decode süresi uzun olabilir (1-2 saniye)
-- Thumbnail strategy ile bu sorun minimize edilir
-- **Not**: Production'da CDN + image optimization önerilir
+- **Çözüm**: Thumbnail strategy ile bu sorun minimize edilir
 
 ---
 
-## 📧 Teslimat ve İletişim
+## 📧 Teslim
 
 ### Repository
 
@@ -385,11 +366,11 @@ npx tsc --noEmit           # Type check
 
 ### Delivery Checklist
 
-✅ Kod tamamlandı
-✅ Test coverage ≥80%
-✅ Lint & TypeScript check geçti
-✅ SonarQube analizi yapıldı
-✅ README dokümantasyonu hazır
+- ✅ Kod tamamlandı
+- ✅ Tüm buglar giderildi
+- ✅ Test coverage ≥80%
+- ✅ Lint & TypeScript & Audit check geçti
+- ✅ SonarQube analizi yapıldı
 
 ---
 
