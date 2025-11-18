@@ -19,7 +19,6 @@ Bu dokümantasyon, Instagram klonu case study projesinin teknik mimarisi, karar 
 9. [Authentication & Secure Storage](#authentication--secure-storage)
 10. [Test, Lint, TypeScript & SonarQube](#test-lint-typescript--sonarqube)
 11. [Bilinen Sınırlamalar](#bilinen-sınırlamalar)
-12. [Teslimat ve İletişim](#teslimat-ve-iletişim)
 
 ---
 
@@ -382,7 +381,6 @@ npx tsc --noEmit           # Type check
 
 ### Repository
 
-- **GitHub/Bitbucket**: [Repository URL]
 - **Branch**: `main`
 
 ### Delivery Checklist
@@ -393,24 +391,10 @@ npx tsc --noEmit           # Type check
 ✅ SonarQube analizi yapıldı
 ✅ README dokümantasyonu hazır
 
-### İletişim
-
-**Email**: developer.yunus.yavuz@gmail.com
-
-**Sorular için:**
-- Projede anlamadığın, emin olmadığın yerler olursa bizimle iletişime geçebilirsin.
-- Code review sırasında sorularını iletebilirsin.
-
----
-
-## 🎓 Gelecek İyileştirmeler
-
-Real API Integration, Image/Video CDN, Biometric Auth, Push Notifications, Analytics, Crash Reporting, Deep Linking, Offline Support
-
 ---
 
 ## 🙏 Teşekkürler
 
-Zamanın için şimdiden çok teşekkürler! Umarım bu case study senin için değerli bir öğrenme deneyimi olmuştur.
+Zamanınız için şimdiden çok teşekkürler!
 
 **Başarılar! 🚀**
