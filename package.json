@@ -1,6 +1,6 @@
 {
-  "name": "StoikkProject",
-  "version": "0.0.1",
+  "name": "rn-social-boilerplate",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
