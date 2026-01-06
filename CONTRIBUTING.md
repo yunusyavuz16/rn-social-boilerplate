@@ -64,7 +64,7 @@ Feature requests are welcome! Please provide:
 
 ```bash
 # Clone your fork
-git clone https://github.com/yunusyavuz016/rn-social-boilerplate.git
+git clone https://github.com/yunusyavuz16/rn-social-boilerplate.git
 cd rn-social-boilerplate
 
 # Install dependencies
