@@ -25,7 +25,7 @@ describe('SecureStorageService', () => {
 
       expect(result).toBe(true);
       expect(Keychain.setGenericPassword).toHaveBeenCalledWith('test_key', 'test_value', {
-        service: 'StoikkKeychain',
+        service: 'SocialBoilerplateKeychain',
       });
     });
 
@@ -114,7 +114,7 @@ describe('SecureStorageService', () => {
 
       expect(result).toBe(true);
       expect(Keychain.setGenericPassword).toHaveBeenCalledWith('username', 'password', {
-        service: 'StoikkKeychain',
+        service: 'SocialBoilerplateKeychain',
       });
     });
 

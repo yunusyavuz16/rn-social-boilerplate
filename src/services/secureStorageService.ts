@@ -7,7 +7,7 @@ import {STORAGE_KEYS} from '@constants/storage.constants';
  * Uses iOS Keychain and Android Keystore for secure storage
  */
 class SecureStorageService {
-  private readonly service = 'StoikkKeychain';
+  private readonly service = 'SocialBoilerplateKeychain';
 
   async setItem(key: string, value: string): Promise<boolean> {
     try {

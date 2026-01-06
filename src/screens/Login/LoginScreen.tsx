@@ -33,7 +33,7 @@ export const LoginScreen: React.FC = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}>
         <ThemedView style={styles.container}>
-          <ThemedText style={styles.title}>Instagram Clone</ThemedText>
+          <ThemedText style={styles.title}>Social Boilerplate</ThemedText>
           <ThemedView style={styles.form}>
             <Input
               label="Username"

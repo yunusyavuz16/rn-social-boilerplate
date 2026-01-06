@@ -9,7 +9,7 @@ platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
 # Explicitly specify the Xcode project to avoid CocoaPods auto-detection issues
-project 'StoikkProject.xcodeproj'
+project 'RNSocialBoilerplate.xcodeproj'
 
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
@@ -17,7 +17,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'StoikkProject' do
+target 'RNSocialBoilerplate' do
   config = use_native_modules!
 
   use_react_native!(

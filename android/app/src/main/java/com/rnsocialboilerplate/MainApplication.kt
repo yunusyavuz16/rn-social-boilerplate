@@ -1,4 +1,4 @@
-package com.stoikkproject
+package com.rnsocialboilerplate
 
 import android.app.Application
 import com.facebook.react.PackageList

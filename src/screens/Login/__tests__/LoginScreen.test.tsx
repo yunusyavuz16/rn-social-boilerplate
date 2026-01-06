@@ -51,7 +51,7 @@ describe('LoginScreen', () => {
   it('should render login form', () => {
     const {getByText, getByPlaceholderText} = renderWithProviders(<LoginScreen />);
 
-    expect(getByText('Instagram Clone')).toBeTruthy();
+    expect(getByText('Social Boilerplate')).toBeTruthy();
     expect(getByPlaceholderText('Enter username')).toBeTruthy();
     expect(getByPlaceholderText('Enter password')).toBeTruthy();
     expect(getByText('Login')).toBeTruthy();

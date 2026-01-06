@@ -18,9 +18,10 @@
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="./documents/screenshots/feed.png" width="220" alt="Feed Screen" />
-  <img src="./documents/screenshots/search.png" width="220" alt="Search Screen" />
-  <img src="./documents/screenshots/profile.png" width="220" alt="Profile Screen" />
+  <img src="./documents/screenshots/login.png" width="180" alt="Login Screen" />
+  <img src="./documents/screenshots/home.png" width="180" alt="Home Feed" />
+  <img src="./documents/screenshots/grid.png" width="180" alt="Search Grid" />
+  <img src="./documents/screenshots/profile.png" width="180" alt="Profile Screen" />
 </p>
 
 ---
