@@ -56,7 +56,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/rn-social-boilerplate.git
+git clone https://github.com/yunusyavuz016/rn-social-boilerplate.git
 cd rn-social-boilerplate
 
 # Install dependencies
